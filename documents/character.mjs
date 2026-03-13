@@ -580,6 +580,12 @@ export class Character extends Actor {
     }
 
     updateTokenGlow(newSwingAttributeId) {
+        if (!game.settings.get("sentiment", "swing-glow-enabled")) return;
+        if (typeof TokenMagic === "undefined") {
+            ui.notifications.error("Swing Glow requires the Module \"Token Magic FX\" to be installed and enabled:\nhttps://foundryvtt.com/packages/tokenmagic/")
+            return
+        }
+
         const targetTokens = [].concat(this.getTokens());
         if (!newSwingAttributeId) newSwingAttributeId = this.system.swing.attributeId
 
@@ -600,7 +606,7 @@ export class Character extends Actor {
                 filterId: "swing-glow",
                 color: attribute.system.color,
                 quality: 0.1,
-                outerStrength: 1.2,
+                outerStrength: game.settings.get("sentiment", "swing-glow-intensity") || 1.2,
                 innerStrength: 0,
                 padding: 0,
             }];

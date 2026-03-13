@@ -1,3 +1,5 @@
+import registerSettings from "./sentiment-system-settings.mjs";
+
 import {
     AttributeData,
     Attribute
@@ -28,6 +30,8 @@ import tryCreateCharacterMacro from "./macro.mjs"
 
 Hooks.once("init", async function () {
     console.log(`Initializing Sentiment System`); 
+
+    registerSettings();
 
     CONFIG.Item.dataModels.attribute = AttributeData;
     CONFIG.Item.dataModels.gift = GiftData;
