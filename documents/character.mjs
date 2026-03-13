@@ -575,7 +575,7 @@ export class Character extends Actor {
 
     removeSwingGlow() {
         for (const token of this.getTokens()) {
-            TokenMagic.deleteFilters(token,"swing-glow");
+            token.mesh.filters = token.mesh?.filters?.filter(f => f.filterId !== "swing-glow") || [];
         }
     }
 
