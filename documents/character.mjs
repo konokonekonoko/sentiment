@@ -616,12 +616,9 @@ export class Character extends Actor {
             if (filters.includes(newSwing)) continue;
 
             // else, remove old swing
-            let newFilters = filters
-            if (filters.some(f => f.filterId === "swing-glow")) {
-                newFilters = filters.filter(f => f.filterId !== "swing-glow")
-            }
-            newFilters.push(newSwing)
-            token.mesh.filters = newFilters
+            const newFilters = filters.filter(f => f.filterId !== "swing-glow");
+            newFilters.push(newSwing);
+            token.mesh.filters = newFilters;
         }
     }
 }
