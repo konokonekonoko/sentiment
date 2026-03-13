@@ -496,6 +496,17 @@ export class Character extends Actor {
         });
     }
 
+    /**
+    * Get an Actor's associated Tokens. For linked Actors, it returns an array of all active Tokens,
+    * for unlinked actors, just the Token the function is called on.
+    */
+    getTokens() {
+        if (this.isToken && this.token) {
+            return this.token.object;  // unlinked actors
+        }
+        return this.getActiveTokens(); // linked actors
+    }
+
     /** @inheritdoc */
     _onUpdate(changed, options, userId) {
 
@@ -507,8 +518,8 @@ export class Character extends Actor {
                 this.#clampSwingValue(newSwingAttributeId, newSwingValue);
             }
 
-            if (newSwingAttributeId && this.system.swingTokenImages.enabled) {
-                this.#updateTokenImages(newSwingAttributeId);
+            if (newSwingAttributeId) {
+                this.#updateTokenSwing(newSwingAttributeId);
             }
         }
 
@@ -535,11 +546,7 @@ export class Character extends Actor {
         }
     }
 
-    #updateTokenImages(newSwingAttributeId) {
-        const customTokenImagePath = newSwingAttributeId != AttributeIdNoSwing
-            ? this.items.find((item) => item._id === newSwingAttributeId).system.customTokenImagePath
-            : this.system.swingTokenImages.defaultTokenImagePath;
-
+    #updateTokenSwing(newSwingAttributeId) {
         const targetTokens = [];
 
         if (this.isToken) {
@@ -550,6 +557,60 @@ export class Character extends Actor {
             this.getDependentTokens().filter((token) => token.actorLink).forEach((token) => targetTokens.push(token));
         }
 
+        if (this.system.swingTokenImages.enabled) {
+            this.#updateTokenImages(newSwingAttributeId,targetTokens);
+        }
+        if (true) {
+            this.updateTokenGlow(newSwingAttributeId)
+        }
+    }
+
+    #updateTokenImages(newSwingAttributeId,targetTokens) {
+        const customTokenImagePath = newSwingAttributeId != AttributeIdNoSwing
+            ? this.items.find((item) => item._id === newSwingAttributeId).system.customTokenImagePath
+            : this.system.swingTokenImages.defaultTokenImagePath;
+
         targetTokens.forEach((token) => token.update({ "texture.src": customTokenImagePath }));
+    }
+
+    removeSwingGlow() {
+        for (const token of this.getTokens()) {
+            TokenMagic.deleteFilters(token,"swing-glow");
+        }
+    }
+
+    updateTokenGlow(newSwingAttributeId) {
+        const targetTokens = [].concat(this.getTokens());
+        if (!newSwingAttributeId) newSwingAttributeId = this.system.swing.attributeId
+
+        if (newSwingAttributeId === AttributeIdNoSwing) {
+            for (const token of targetTokens) {
+                if (!TokenMagic.hasFilterId(token, "swing-glow")) continue;
+                TokenMagic.deleteFilters(token,"swing-glow");
+            }
+            return;
+        }
+
+        const attribute = this.items.get(newSwingAttributeId);
+        if ( !(attribute && attribute.system.color) ) return;
+
+        for (const token of targetTokens) {
+            const newSwing = [{
+                filterType: "glow",
+                filterId: "swing-glow",
+                color: attribute.system.color,
+                quality: 0.1,
+                outerStrength: 1.2,
+                innerStrength: 0,
+                padding: 0,
+            }];
+
+            if (TokenMagic.hasFilterId(token, "swing-glow")) {
+                TokenMagic.updateFiltersByPlaceable(token, newSwing);
+            }
+            else {
+                TokenMagic.addFilters(token, newSwing);
+            }
+        }
     }
 }
