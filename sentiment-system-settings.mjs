@@ -8,7 +8,7 @@ export default function registerSettings() {
         scope: "client",
         config: true,
         type: Boolean,
-        default: true,
+        default: false,
     });
 
     game.settings.register("sentiment", "swing-glow-intensity", {
