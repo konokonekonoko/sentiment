@@ -580,12 +580,10 @@ export class Character extends Actor {
     }
 
     updateTokenGlow(newSwingAttributeId) {
-        console.log("updateTokenGlow")
         if (!game.settings.get("sentiment", "swing-glow-enabled")) return;
-        console.log("updateTokenGlow 2")
 
         const targetTokens = [].concat(this.getTokens());
-        if (!newSwingAttributeId) newSwingAttributeId = this.system.swing.attributeId
+        if (!newSwingAttributeId) newSwingAttributeId = this.system.swing.attributeId;
 
         if (newSwingAttributeId === AttributeIdNoSwing) {
             for (const token of targetTokens) {
@@ -595,8 +593,6 @@ export class Character extends Actor {
                 if (previousGlows?.length === 0) continue;
 
                 token.mesh.filters = token.mesh?.filters?.filter(f => f.filterId !== "swing-glow") || [];
-
-                console.log("aaaaaaa",token.mesh.filters)
             }
             return;
         }
@@ -606,9 +602,7 @@ export class Character extends Actor {
 
         for (const token of targetTokens) {
             token.mesh ??= {};
-            const filters = token.mesh.filters ??= []
-
-            console.log("bbbbbbb",token.mesh.filters)
+            const filters = token.mesh.filters ??= [];
 
             const newSwing = new PIXI.filters.GlowFilter({
                 color: attribute.system.color,
@@ -626,7 +620,6 @@ export class Character extends Actor {
             if (filters.some(f => f.filterId === "swing-glow")) {
                 newFilters = filters.filter(f => f.filterId !== "swing-glow")
             }
-            console.log("newFilters",newFilters)
             newFilters.push(newSwing)
             token.mesh.filters = newFilters
         }
