@@ -78,12 +78,9 @@ Hooks.once("init", async function () {
 
 Hooks.on("hotbarDrop", (bar, data, slot) => tryCreateCharacterMacro(data, slot));
 
-Hooks.on("ready", () => {
 
-
-    Hooks.on("drawToken", (token) => {
-        if (!token.actor) return;
-        // Run the function once when the token is first drawn to reset everything.
+Hooks.once("canvasReady", (canvas) => {
+    canvas.tokens.placeables.forEach(token => {
         token.actor.updateTokenGlow();
     });
 });

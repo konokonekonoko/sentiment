@@ -580,19 +580,23 @@ export class Character extends Actor {
     }
 
     updateTokenGlow(newSwingAttributeId) {
+        console.log("updateTokenGlow")
         if (!game.settings.get("sentiment", "swing-glow-enabled")) return;
-        if (typeof TokenMagic === "undefined") {
-            ui.notifications.error("Swing Glow requires the Module \"Token Magic FX\" to be installed and enabled:\nhttps://foundryvtt.com/packages/tokenmagic/")
-            return
-        }
+        console.log("updateTokenGlow 2")
 
         const targetTokens = [].concat(this.getTokens());
         if (!newSwingAttributeId) newSwingAttributeId = this.system.swing.attributeId
 
         if (newSwingAttributeId === AttributeIdNoSwing) {
             for (const token of targetTokens) {
-                if (!TokenMagic.hasFilterId(token, "swing-glow")) continue;
-                TokenMagic.deleteFilters(token,"swing-glow");
+                token.mesh ??= {};
+
+                const previousGlows = token.mesh?.filters?.filter(f => f.filterId === "swing-glow") || [];
+                if (previousGlows?.length === 0) continue;
+
+                token.mesh.filters = token.mesh?.filters?.filter(f => f.filterId !== "swing-glow") || [];
+
+                console.log("aaaaaaa",token.mesh.filters)
             }
             return;
         }
@@ -601,22 +605,30 @@ export class Character extends Actor {
         if ( !(attribute && attribute.system.color) ) return;
 
         for (const token of targetTokens) {
-            const newSwing = [{
-                filterType: "glow",
-                filterId: "swing-glow",
+            token.mesh ??= {};
+            const filters = token.mesh.filters ??= []
+
+            console.log("bbbbbbb",token.mesh.filters)
+
+            const newSwing = new PIXI.filters.GlowFilter({
                 color: attribute.system.color,
                 quality: 0.1,
                 outerStrength: game.settings.get("sentiment", "swing-glow-intensity") || 1.2,
                 innerStrength: 0,
-                padding: 0,
-            }];
+            });
+            newSwing.filterId = "swing-glow"
 
-            if (TokenMagic.hasFilterId(token, "swing-glow")) {
-                TokenMagic.updateFiltersByPlaceable(token, newSwing);
+            // if filter is already applied, skip
+            if (filters.includes(newSwing)) continue;
+
+            // else, remove old swing
+            let newFilters = filters
+            if (filters.some(f => f.filterId === "swing-glow")) {
+                newFilters = filters.filter(f => f.filterId !== "swing-glow")
             }
-            else {
-                TokenMagic.addFilters(token, newSwing);
-            }
+            console.log("newFilters",newFilters)
+            newFilters.push(newSwing)
+            token.mesh.filters = newFilters
         }
     }
 }

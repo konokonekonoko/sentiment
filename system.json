@@ -18,6 +18,9 @@
       "url": "https://github.com/tomlaflin"
     }
   ],
+  "scripts": [
+    "libs/filters/pixi-filters.js"
+  ],
   "esmodules": [ "sentiment.mjs" ],
   "styles": [ "styles/sentiment.css" ],
   "gridDistance": 5,
