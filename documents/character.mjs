@@ -82,7 +82,7 @@ export class Character extends Actor {
     * Perform a Roll to Do and display the result as a chat message.
     * @param additionalDiceFormula
     */
-    async rollToDo(additionalDiceFormula) {
+    async rollToDo({additionalDiceFormula, triggeringRoll} = {}) {
         const swingAttribute = this.#getSwingAttribute();
         const swingValue = this.system.swing.value;
         
@@ -95,8 +95,9 @@ export class Character extends Actor {
             d20Roll: d20Roll.total,
             toHit: d20Roll.total,
             effect: 0,
-            critSuccess: d20Roll.total == 20,
-            critFail: d20Roll.total == 1,
+            critSuccess: d20Roll.total === 20,
+            critFail: d20Roll.total === 1,
+            triggeringRoll,
         };
 
         if (swingAttribute) {
