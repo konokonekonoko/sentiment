@@ -25,6 +25,8 @@ import {
 
 import tryCreateCharacterMacro from "./macro.mjs"
 
+import * as Chat from "./chat.mjs";
+
 
 Hooks.once("init", async function () {
     console.log(`Initializing Sentiment System`); 
@@ -69,7 +71,23 @@ Hooks.once("init", async function () {
     Character.RegisterHandlebarsHelpers();
     CharacterSheet.RegisterHandlebarsHelpers();
 
-    await loadTemplates(["systems/sentiment/templates/partials/gift-list.html"]);
+    await loadTemplates([
+        "systems/sentiment/templates/partials/gift-list.html",
+        "systems/sentiment/templates/partials/swing.html"
+    ]);
+
+    // Utility Globals
+    window.selectedActor = function () {
+        const selected = canvas.tokens.controlled[0]
+        if (!selected) return
+        const actor = selected.actor
+        if (!actor) return
+        return actor;
+    }
 });
 
 Hooks.on("hotbarDrop", (bar, data, slot) => tryCreateCharacterMacro(data, slot));
+
+// chat functionality
+Hooks.on("renderChatLog", (app, html, data) => Chat.addChatListeners(html));
+Hooks.on("renderChatMessage", (app, html, data) => Chat.onRenderChatMessage(app, html, data));

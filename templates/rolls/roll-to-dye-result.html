@@ -1,15 +1,42 @@
 <div class="sentiment">
     <h3>{{title}} Result</h3>
+    <h4 class="chosen-swing-text">Chosen Swing: 
+        {{#if swingAttribute}}
+        {{> "systems/sentiment/templates/partials/swing.html"
+            attribute=swingAttribute
+            value=swingValue
+            }}
+        {{else}}
+        None
+        {{/if}}
+    </h4>
     <div class="dice-roll">
         <div class="dice-result">
             <h4 class="dice-total">{{total}}</h4>
         </div>
     </div>
-    <h4 class="chosen-swing-text">Chosen Swing: 
-        {{#if swingAttribute}}
-        <span class="swing" style="background-color:{{attributeBackgroundColor swingAttribute}}">{{swingValue}}</span>
+
+    {{#if triggeringRoll}}
+    <h4 class="centered-text roll-vs">VS {{triggeringRoll.origin.name}}'s {{triggeringRoll.title}}
+        {{> "systems/sentiment/templates/partials/swing.html"
+            attribute=triggeringRoll.attribute
+            value=triggeringRoll.toHit
+            }}</h4>
+    <h4 class="centered-text roll-{{#if success}}success{{else}}failure{{/if}}">
+        {{#if success}}
+        Success!
         {{else}}
-        None
+        Failure...
         {{/if}}
     </h4>
+
+    <div class="response-buttons" {{!-- data-visibleto="{{speakerUuid}}" --}}>
+        <button data-action="take-damage-menu" data-value="damage:{{triggeringRoll.effect}}">
+            Take Damage
+        </button>
+        <button data-action="take-damage-menu" data-value="heal:{{triggeringRoll.effect}}">
+            Heal
+        </button>
+    </div>
+    {{/if}}
 </div>

@@ -241,11 +241,14 @@
 	margin: 2px 5px 2px 0;
 }
 
+.sentiment .dice-rolls {
+	line-height: 32px;
+}
+
 .sentiment .dice-rolls .attribute-modifier-die,
 .sentiment .swing {
-	border-radius: 16px;
-	min-width: 32px;
-	line-height: 32px;
+	border-radius: 50%;
+	min-width: 1lh;
 }
 
 .sentiment .chosen-swing-text {
@@ -261,8 +264,27 @@
 	display: inline-block;
 	position: relative;
 	background-repeat: no-repeat;
+	text-align: center;
 }
 
 .sentiment .roll-to-do-results .roll-to-do-result {
 	flex: 50%
+}
+
+
+.sentiment .centered-text {
+	text-align: center;
+}
+
+.message-content .sentiment .response-buttons {
+	display: flex;
+}
+.message-content .sentiment .roll-vs {
+	line-height: 1.2lh;
+}
+
+.message-content .sentiment .roll-failure,
+.message-content .sentiment .roll-success {
+	font-size: 1.2em;
+	font-weight: bold;
 }
