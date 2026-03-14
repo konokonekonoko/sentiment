@@ -1,1 +1,12 @@
 {{{message}}}
+
+{{#if recoveryRollPrompt}}
+<div class="response-buttons" data-visibleto="{{speakerUuid}}">
+    <button data-action="roll-to-recover">
+        Roll to Recover!
+    </button>
+    <button data-action="roll-custom" data-response="true">
+        Custom Roll!
+    </button> 
+</div>
+{{/if}}

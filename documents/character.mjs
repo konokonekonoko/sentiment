@@ -258,14 +258,15 @@ export class Character extends Actor {
     * Perform a Recovery Roll and display the result as a chat message.
     * @param additionalDiceFormula
     */
-    async recoveryRoll(additionalDiceFormula) {
+    async recoveryRoll({additionalDiceFormula, triggeringRoll} = {}) {
         const rollToDyeOptions = {
             rollTitle: "Recovery Roll",
             totalStrategy: this.#totalAllAttributeRollsAndModifiers,
         }
         const rollToDyeTotal = await this.#rollToDyeImpl({
             options: rollToDyeOptions,
-            additionalDiceFormula
+            additionalDiceFormula,
+            triggeringRoll
         });
         const newHealth = Math.min(this.system.health.value + rollToDyeTotal, this.system.health.max);
 
@@ -510,17 +511,47 @@ export class Character extends Actor {
     * Executes the specified custom roll.
     * @param customRollId
     */
-    async executeCustomRoll(customRollId) {
+    async executeCustomRoll({customRollId, triggeringRoll} = {}) {
         const customRoll = this.items.find((item) => item._id === customRollId);
         if (!customRoll) {
             throw new Error("Custom Roll with ID " + customRollId + " not found on Character with ID " + this._id);
         }
 
         const rollFunction = RollTypes[customRoll.system.rollType].FunctionName;
-        return this[rollFunction]({
+
+        const additionalDiceFormula = {
             toHit: customRoll.system.formulaAddedToHit,
             toEffect: customRoll.system.formulaAddedToEffect
-        });
+        }
+        return this[rollFunction]({additionalDiceFormula, triggeringRoll});
+    }
+
+    async chooseCustomRollDialog() {
+        const customRolls = this.itemTypes?.customRoll ?? [];
+        const content = `Choose a Custom Roll to execute.`;
+
+        console.log("customRolls",customRolls)
+        return new Promise((resolve, reject) => {
+            let buttons = {};
+
+            customRolls.forEach((roll) =>
+                buttons[roll._id] = {
+                    label: roll.name + `: ${roll.system.rollType} `+
+                        `(${roll.system.formulaAddedToHit ? roll.system.formulaAddedToHit : "+0"} to Hit, `+
+                        `${roll.system.formulaAddedToEffect ? roll.system.formulaAddedToEffect : "+0"} to Effect)`,
+                    callback: () => { resolve(this.executeCustomRoll({ customRollId: roll._id })) }
+                }
+            );
+
+            const chooseCustomRollDialog = {
+                title: "Choose Custom Roll",
+                content: content,
+                buttons: buttons,
+                close: () => { reject() }
+            };
+
+            new Dialog(chooseCustomRollDialog).render(true);
+        })
     }
 
     /**
@@ -534,18 +565,21 @@ export class Character extends Actor {
         // const contentTemplatePath = "systems/sentiment/templates/rolls/roll-to-dye-choose-swing.html";
         const content = `` // await renderTemplate(contentTemplatePath, {});
 
+        function displayDamage(mult) {
+            return String(Math.round(value * mult))
+        }
         return new Promise((resolve, reject) => {
             let buttons = {
                 half: {
-                    label: "Half: " + String(value * 0.5) + " HP",
+                    label: "Half: " + displayDamage(0.5) + " HP",
                     callback: () => { resolve(0.5) }
                 },
                 full: {
-                    label: "Full: " + String(value * 1) + " HP",
+                    label: "Full: " + displayDamage(1) + " HP",
                     callback: () => { resolve(1) }
                 },
                 double: {
-                    label: "Double: " + String(value * 2) + " HP",
+                    label: "Double: " + displayDamage(2) + " HP",
                     callback: () => { resolve(2) }
                 },
                 // TODO add block function here for damageAction=damage
@@ -649,6 +683,8 @@ export class Character extends Actor {
 
     async #woundedChat(attribute) {
         const messageText = [`${this.name}'s ${attribute.name} attribute is wounded!`];
+        let recoveryRollPrompt = false;
+        
         const attributes = this.getAttributes();
         let remaining = 999
         if (attributes.length) {
@@ -659,6 +695,7 @@ export class Character extends Actor {
             messageText.push(
                 (remaining < 900 ? `They hang on with ${remaining - 1} attribute${remaining>2?"s":""} remaining.` : "")
             );
+            recoveryRollPrompt = true;
         }
         else {
             messageText.push(
@@ -669,7 +706,8 @@ export class Character extends Actor {
         const context = {
             message: messageText
                 .map(m => `${m}`)
-                .join(" ")
+                .join(" "),
+            recoveryRollPrompt,
         }
 
         const templatePath = "systems/sentiment/templates/damage/actor-take-damage.html";

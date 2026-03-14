@@ -243,7 +243,7 @@ export default class CharacterSheet extends ActorSheet {
                     macroName: this.object.name + ": " + customRoll.name,
                     actorId: this.object._id,
                     function: "executeCustomRoll",
-                    argsLiteral: `"${customRoll._id}"`
+                    argsLiteral: `{ customRollId: "${customRoll._id}" }`
                 };
                 event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
             }, false);
@@ -419,7 +419,7 @@ export default class CharacterSheet extends ActorSheet {
         event.preventDefault();
 
         const customRoll = this.#getItemFromListEvent(event);
-        this.object.executeCustomRoll(customRoll._id);
+        this.object.executeCustomRoll({ customRollId: customRoll._id });
     }
 
     /** @inheritdoc */
