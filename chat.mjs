@@ -38,22 +38,33 @@ async function _onAction(event) {
 
     const selectedActor = window.selectedActor();
 
-    let triggeringRoll;
+    let rollTrigger;
     switch (action) {
         case "roll-to-dye":
             if (!selectedActor) {
                 ui.notifications.warn("You need to select a token to do this!");
                 return false;
             }
-            triggeringRoll = messageApp.getFlag("sentiment", "Roll to Do");
-            await selectedActor.rollToDye({ triggeringRoll });
+            rollTrigger = messageApp.getFlag("sentiment", "Roll to Do");
+            await selectedActor.rollToDye({ rollTrigger });
+            break;
+        case "roll-to-recover":
+            if (!selectedActor) {
+                ui.notifications.warn("You need to select a token to do this!");
+                return false;
+            }
+            await selectedActor.recoveryRoll({
+                rollTrigger: {
+                    type: "wound"
+                }
+            });
             break;
         case "roll-custom":
             if (!selectedActor) {
                 ui.notifications.warn("You need to select a token to do this!");
                 return false;
             }
-            await selectedActor.chooseCustomRollDialog({ triggeringRoll });
+            await selectedActor.chooseCustomRollDialog({ rollTrigger });
             break;
         case "take-damage-menu":
             if (!selectedActor) {
@@ -62,12 +73,14 @@ async function _onAction(event) {
             }
             handleTakeDamagePrompt(selectedActor, data.value);
             break;
-        case "roll-to-recover":
+        case "take-wound":
             if (!selectedActor) {
                 ui.notifications.warn("You need to select a token to do this!");
                 return false;
             }
-            await selectedActor.recoveryRoll({ triggeringRoll });
+            if (selectedActor.getUnwoundedAttributes().length) {
+                await selectedActor.woundAttributeDialog({toChat: true});
+            }
             break;
         default:
             console.warn(

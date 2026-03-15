@@ -1,12 +1,30 @@
 {{{message}}}
 
-{{#if recoveryRollPrompt}}
-<div class="response-buttons" data-visibleto="{{speakerUuid}}">
-    <button data-action="roll-to-recover">
-        Roll to Recover!
-    </button>
-    <button data-action="roll-custom" data-response="true">
-        Custom Roll!
-    </button> 
+{{#if wounded}}
+<p>
+    {{speaker.name}}'s HP has reached 0.
+    {{#if recoveryRollPrompt}}
+        They must Roll to Recover, then take a wound.
+    {{else}}
+        They must take a wound.
+    {{/if}}
+</p>
+<div class="response-buttons" data-visibleto="{{this.uuid}}">
+    {{#if recoveryRollPrompt}}
+    <div class="flex-row">
+        <button data-action="roll-to-recover">
+            Roll to Recover!
+        </button>
+        <button data-action="roll-custom" data-response="true">
+            Custom Roll!
+        </button> 
+    </div>
+    {{else}}
+    <div class="flex-row">
+        <button data-action="take-wound">
+            Take a Wound!
+        </button>
+    </div>
+    {{/if}}
 </div>
 {{/if}}

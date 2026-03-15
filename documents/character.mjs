@@ -72,6 +72,13 @@ export class Character extends Actor {
     }
 
     /**
+    * Returns an array of the character's unwounded attributes.
+    */
+    getUnwoundedAttributes() {
+        return this.getAttributes().filter(a => a.system.status !== AttributeStatus.Wounded);
+    }
+
+    /**
     * Returns the attribute associated with the character's current swing, or undefined if no matching attribute is found.
     */
     #getSwingAttribute() {
@@ -82,7 +89,7 @@ export class Character extends Actor {
     * Perform a Roll to Do and display the result as a chat message.
     * @param additionalDiceFormula
     */
-    async rollToDo({additionalDiceFormula, triggeringRoll} = {}) {
+    async rollToDo({additionalDiceFormula, rollTrigger} = {}) {
         const swingAttribute = this.#getSwingAttribute();
         const swingValue = this.system.swing.value;
         
@@ -92,12 +99,13 @@ export class Character extends Actor {
         const templatePath = "systems/sentiment/templates/rolls/roll-to-do.html";
         let templateValues = {
             title: "Roll to Do",
+            type: "rollToDo",
             d20Roll: d20Roll.total,
             toHit: d20Roll.total,
             effect: 0,
             critSuccess: d20Roll.total === 20,
             critFail: d20Roll.total === 1,
-            triggeringRoll,
+            rollTrigger,
         };
 
         if (swingAttribute) {
@@ -199,7 +207,7 @@ export class Character extends Actor {
     async #renderToChatMessage(templatePath, args, messageOptions = {}) {
         const html = await renderTemplate(templatePath, {
             ...args,
-            speakerUuid: this.uuid
+            speaker: this,
         });
         let message = {
             user: game.user.id,
@@ -242,15 +250,16 @@ export class Character extends Actor {
     * Perform a Roll to Dye and display the result as a chat message.
     * @param additionalDiceFormula
     */
-    async rollToDye({additionalDiceFormula,triggeringRoll} = {}) {
+    async rollToDye({additionalDiceFormula,rollTrigger} = {}) {
         const rollToDyeOptions = {
             rollTitle: "Roll to Dye",
+            rollType: "rollToDye",
             totalStrategy: this.#totalAllAttributeRollsAndOnlySwingModifier,
         }
         this.#rollToDyeImpl({
             options: rollToDyeOptions,
             additionalDiceFormula,
-            triggeringRoll
+            rollTrigger
         });
     }
 
@@ -258,15 +267,16 @@ export class Character extends Actor {
     * Perform a Recovery Roll and display the result as a chat message.
     * @param additionalDiceFormula
     */
-    async recoveryRoll({additionalDiceFormula, triggeringRoll} = {}) {
+    async recoveryRoll({additionalDiceFormula, rollTrigger} = {}) {
         const rollToDyeOptions = {
             rollTitle: "Recovery Roll",
+            rollType: "recoveryRoll",
             totalStrategy: this.#totalAllAttributeRollsAndModifiers,
         }
         const rollToDyeTotal = await this.#rollToDyeImpl({
             options: rollToDyeOptions,
             additionalDiceFormula,
-            triggeringRoll
+            rollTrigger
         });
         const newHealth = Math.min(this.system.health.value + rollToDyeTotal, this.system.health.max);
 
@@ -303,7 +313,7 @@ export class Character extends Actor {
     * @param additionalDiceFormula
     * @private
     */
-    async #rollToDyeImpl({options, additionalDiceFormula, triggeringRoll} = {}) {
+    async #rollToDyeImpl({options, additionalDiceFormula, rollTrigger} = {}) {
         const swingAttribute = this.#getSwingAttribute();
         const swingValue = this.system.swing.value;
         const existingSwingAttributeDie = swingAttribute ? {
@@ -332,9 +342,10 @@ export class Character extends Actor {
 
         this.#renderRollToDyeResult({
             rollTitle: options.rollTitle,
+            rollType: options.rollType,
             total: rollToDyeTotal,
             swingAttributeDie: newSwingAttributeDie,
-            triggeringRoll
+            rollTrigger
         });
 
         return rollToDyeTotal;
@@ -447,13 +458,14 @@ export class Character extends Actor {
     * @param swingAttributeDie
     * @private
     */
-    async #renderRollToDyeResult({rollTitle, total, swingAttributeDie, triggeringRoll} = {}) {
+    async #renderRollToDyeResult({rollTitle, rollType, total, swingAttributeDie, rollTrigger} = {}) {
         const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-result.html";
         let templateValues = {
             title: rollTitle,
+            type: rollType,
             total,
-            triggeringRoll,
-            success: total > triggeringRoll?.toHit, // I don't remember if its greater-equal or greater-than for a success
+            rollTrigger,
+            success: total > rollTrigger?.toHit, // I don't remember if its greater-equal or greater-than for a success
         };
 
         if (swingAttributeDie !== null) {
@@ -511,7 +523,7 @@ export class Character extends Actor {
     * Executes the specified custom roll.
     * @param customRollId
     */
-    async executeCustomRoll({customRollId, triggeringRoll} = {}) {
+    async executeCustomRoll({customRollId, rollTrigger} = {}) {
         const customRoll = this.items.find((item) => item._id === customRollId);
         if (!customRoll) {
             throw new Error("Custom Roll with ID " + customRollId + " not found on Character with ID " + this._id);
@@ -523,7 +535,7 @@ export class Character extends Actor {
             toHit: customRoll.system.formulaAddedToHit,
             toEffect: customRoll.system.formulaAddedToEffect
         }
-        return this[rollFunction]({additionalDiceFormula, triggeringRoll});
+        return this[rollFunction]({additionalDiceFormula, rollTrigger});
     }
 
     async chooseCustomRollDialog() {
@@ -604,7 +616,7 @@ export class Character extends Actor {
         return await this.#woundedChat(attribute)
     }
 
-    async #woundAttributeDialog({toChat = false} = {}) {
+    async woundAttributeDialog({toChat = false} = {}) {
         const attributes = this.getAttributes();
         const contentTemplatePath = "systems/sentiment/templates/damage/wound-choose-attribute.html";
         const content = await renderTemplate(contentTemplatePath, {});
@@ -671,31 +683,17 @@ export class Character extends Actor {
         if(toChat) {
             this.#damageChat({newValue, damageAction, damage: value * multiplier});
         }
-
-        if (newValue === 0) {
-            const unwoundedAttributes = this.getAttributes()
-                .filter(a => a.system.status !== AttributeStatus.Wounded)
-                .length
-            if (unwoundedAttributes) await this.#woundAttributeDialog({toChat: true});
-        }
-
     }
 
     async #woundedChat(attribute) {
         const messageText = [`${this.name}'s ${attribute.name} attribute is wounded!`];
-        let recoveryRollPrompt = false;
         
-        const attributes = this.getAttributes();
-        let remaining = 999
-        if (attributes.length) {
-            remaining = attributes.filter(a => a.system.status !== AttributeStatus.Wounded).length
-        }
+        const remaining = this.getUnwoundedAttributes().length;
         // message wounded attribute
         if (remaining - 1 > 0) {
             messageText.push(
-                (remaining < 900 ? `They hang on with ${remaining - 1} attribute${remaining>2?"s":""} remaining.` : "")
+                `They hang on with ${remaining - 1} attribute${remaining>2?"s":""} remaining.`
             );
-            recoveryRollPrompt = true;
         }
         else {
             messageText.push(
@@ -707,7 +705,6 @@ export class Character extends Actor {
             message: messageText
                 .map(m => `${m}`)
                 .join(" "),
-            recoveryRollPrompt,
         }
 
         const templatePath = "systems/sentiment/templates/damage/actor-take-damage.html";
@@ -716,9 +713,14 @@ export class Character extends Actor {
 
     async #damageChat({newValue, damageAction, damage} = {}) {
         const messageText = `${this.name} ${damageAction==="heal"?"heals":"takes"} ${damage} ` +
-            `damage and is now at ${newValue} HP.`
+            `damage and is now at ${newValue} HP.`;
+
         const context = {
-            message: messageText
+            message: messageText,
+            wounded: newValue === 0,
+            recoveryRollPrompt: !!(Math.max(
+                0, this.getUnwoundedAttributes().length - 1
+            )),
         }
         const templatePath = "systems/sentiment/templates/damage/actor-take-damage.html";
         return await this.#renderToChatMessage(templatePath, context);

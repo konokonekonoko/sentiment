@@ -16,11 +16,11 @@
         </div>
     </div>
 
-    {{#if triggeringRoll}}
-    <h4 class="centered-text roll-vs">VS {{triggeringRoll.origin.name}}'s {{triggeringRoll.title}}
+    {{#if (eq rollTrigger.type "rollToDo")}}
+    <h4 class="centered-text roll-vs">VS {{rollTrigger.origin.name}}'s {{rollTrigger.title}}
         {{> "systems/sentiment/templates/partials/swing.html"
-            attribute=triggeringRoll.attribute
-            value=triggeringRoll.toHit
+            attribute=rollTrigger.attribute
+            value=rollTrigger.toHit
             }}</h4>
     <h4 class="centered-text roll-{{#if success}}success{{else}}failure{{/if}}">
         {{#if success}}
@@ -30,13 +30,19 @@
         {{/if}}
     </h4>
 
-    <div class="response-buttons" {{!-- data-visibleto="{{speakerUuid}}" --}}>
-        <button data-action="take-damage-menu" data-value="damage:{{triggeringRoll.effect}}">
+    <div class="response-buttons">
+        <button data-action="take-damage-menu" data-value="damage:{{rollTrigger.effect}}">
             Take Damage
         </button>
-        <button data-action="take-damage-menu" data-value="heal:{{triggeringRoll.effect}}">
+        <button data-action="take-damage-menu" data-value="heal:{{rollTrigger.effect}}">
             Heal
         </button>
     </div>
+    {{else if (eq rollTrigger.type "wound")}}
+        <div class="flex-row">
+            <button data-action="take-wound">
+                Take a Wound!
+            </button>
+        </div>
     {{/if}}
 </div>

@@ -275,6 +275,11 @@
 	text-align: center;
 }
 
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+
 .message-content .sentiment .response-buttons {
 	display: flex;
 }
