@@ -600,6 +600,9 @@ export class Character extends Actor {
         const attribute = this.items.get(newSwingAttributeId);
         if ( !(attribute && attribute.system.color) ) return;
 
+        const glowDistance = game.settings.get("sentiment", "swing-glow-distance") || 15;
+        const glowOuterStrength = game.settings.get("sentiment", "swing-glow-intensity") || 2;
+
         for (const token of targetTokens) {
             token.mesh ??= {};
             const filters = token.mesh.filters ??= [];
@@ -607,10 +610,11 @@ export class Character extends Actor {
             const newSwing = new PIXI.filters.GlowFilter({
                 color: attribute.system.color,
                 quality: 0.1,
-                outerStrength: game.settings.get("sentiment", "swing-glow-intensity") || 1.2,
+                distance: glowDistance,
+                outerStrength: glowOuterStrength,
                 innerStrength: 0,
             });
-            newSwing.filterId = "swing-glow"
+            newSwing.filterId = "swing-glow";
 
             // if filter is already applied, skip
             if (filters.includes(newSwing)) continue;
