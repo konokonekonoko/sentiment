@@ -37,6 +37,16 @@ export class CharacterData extends foundry.abstract.DataModel {
                 attributeId: new foundry.data.fields.StringField({
                     initial: AttributeIdNoSwing
                 }),
+                d6roll: new foundry.data.fields.NumberField({
+                    integer: true,
+                    min: 0,
+                    initial: 0
+                }),
+                attributeBonus: new foundry.data.fields.NumberField({
+                    integer: true,
+                    min: 0,
+                    initial: 0
+                }),
                 value: new foundry.data.fields.NumberField({
                     integer: true,
                     min: 0,
@@ -303,7 +313,10 @@ export class Character extends Actor {
         if (chosenAttributeDie != null) {
             this.update({
                 "system.swing.attributeId": chosenAttributeDie.attribute._id,
+                "system.swing.d6roll": chosenAttributeDie.roll,
+                "system.swing.attributeBonus": chosenAttributeDie.attribute.system.modifier,
                 "system.swing.value": chosenAttributeDie.roll + chosenAttributeDie.attribute.system.modifier
+            
             });
         }
         
