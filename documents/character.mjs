@@ -137,8 +137,9 @@ export class Character extends Actor {
             templateValues.effect += attributeModifier;
         }
 
+        const actorRollData = this.getRollData()
         if (additionalDiceFormula?.toHit) {
-            const additionalRollToHit = await new Roll(additionalDiceFormula.toHit, this.system).evaluate();
+            const additionalRollToHit = await new Roll(additionalDiceFormula.toHit, actorRollData).evaluate();
             rolls.push(additionalRollToHit);
             templateValues.additionalDiceToHit = {
                 formula: additionalRollToHit.formula,
@@ -149,7 +150,7 @@ export class Character extends Actor {
         }
 
         if (additionalDiceFormula?.toEffect) {
-            const additionalRollToEffect = await new Roll(additionalDiceFormula.toEffect, this.system).evaluate();
+            const additionalRollToEffect = await new Roll(additionalDiceFormula.toEffect, actorRollData).evaluate();
             rolls.push(additionalRollToEffect);
             templateValues.additionalDiceToEffect = {
                 formula: additionalRollToEffect.formula,
@@ -302,8 +303,9 @@ export class Character extends Actor {
             existing: true
         } : null;
 
+        const actorRollData = this.getRollData()
         const attributeDice = await this.#rollAttributeDice(existingSwingAttributeDie);
-        const additionalDice = additionalDiceFormula?.toEffect ? await new Roll(additionalDiceFormula.toEffect, this.system).evaluate() : null;
+        const additionalDice = additionalDiceFormula?.toEffect ? await new Roll(additionalDiceFormula.toEffect, actorRollData).evaluate() : null;
         await this.#renderAttributeDice(options.rollTitle, attributeDice, additionalDice);
 
         const availableAttributeDice = attributeDice.filter((attributeDie) => attributeDie.attribute.system.status == AttributeStatus.Normal);
