@@ -71,7 +71,7 @@ Hooks.once("init", async function () {
     Character.RegisterHandlebarsHelpers();
     CharacterSheet.RegisterHandlebarsHelpers();
 
-    await loadTemplates([
+    loadTemplates([
         "systems/sentiment/templates/partials/gift-list.html",
         "systems/sentiment/templates/partials/swing.html"
     ]);
