@@ -25,6 +25,8 @@ import {
     AttributeStatusStrings
 } from "./enums.mjs"
 
+import SentimentSocketHandler from "./sentiment-socket-handler.mjs";
+
 import tryCreateCharacterMacro from "./macro.mjs"
 
 
@@ -32,6 +34,8 @@ Hooks.once("init", async function () {
     console.log(`Initializing Sentiment System`); 
 
     registerSettings();
+
+    game.system.socketHandler = new SentimentSocketHandler()
 
     CONFIG.Item.dataModels.attribute = AttributeData;
     CONFIG.Item.dataModels.gift = GiftData;

@@ -23,6 +23,7 @@
   ],
   "esmodules": [ "sentiment.mjs" ],
   "styles": [ "styles/sentiment.css" ],
+  "socket": true,
   "gridDistance": 5,
   "gridUnits": "ft"
 }

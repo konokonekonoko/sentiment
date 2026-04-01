@@ -560,9 +560,12 @@ export class Character extends Actor {
         if (this.system.swingTokenImages.enabled) {
             this.#updateTokenImages(newSwingAttributeId,targetTokens);
         }
-        if (true) {
-            this.updateTokenGlow(newSwingAttributeId)
-        }
+
+        // emit because every client needs to add the new filters individually.
+        game.system.socketHandler.emit("USER.UPDATE-SWING-GLOW", {
+            actorUuid: this.uuid,
+            newSwingAttributeId
+        }, true)
     }
 
     #updateTokenImages(newSwingAttributeId,targetTokens) {
