@@ -28,7 +28,7 @@ import tryCreateCharacterMacro from "./macro.mjs"
 import * as Chat from "./chat.mjs";
 
 
-Hooks.once("init", async function () {
+Hooks.once("init", function () {
     console.log(`Initializing Sentiment System`); 
 
     CONFIG.Item.dataModels.attribute = AttributeData;
@@ -71,7 +71,7 @@ Hooks.once("init", async function () {
     Character.RegisterHandlebarsHelpers();
     CharacterSheet.RegisterHandlebarsHelpers();
 
-    await loadTemplates([
+    loadTemplates([
         "systems/sentiment/templates/partials/gift-list.html",
         "systems/sentiment/templates/partials/swing.html"
     ]);
