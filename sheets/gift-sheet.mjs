@@ -26,8 +26,7 @@ export default class GiftSheet extends ItemSheet {
     async #populateDescription(context) {
         context.descriptionHTML = await CONFIG.Sentiment.Enricher.enrich(
             context.data.system.description,
-            this?.object?.uuid ?? "unknown-object",
-            {
+            this?.object?.uuid ?? "unknown-object", {
                 secrets: this.document.isOwner,
                 async: true
         });
