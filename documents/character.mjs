@@ -44,7 +44,6 @@ export class CharacterData extends foundry.abstract.DataModel {
                 }),
                 attributeBonus: new foundry.data.fields.NumberField({
                     integer: true,
-                    min: 0,
                     initial: 0
                 }),
                 value: new foundry.data.fields.NumberField({
@@ -318,7 +317,6 @@ export class Character extends Actor {
                 "system.swing.d6roll": chosenAttributeDie.roll,
                 "system.swing.attributeBonus": chosenAttributeDie.attribute.system.modifier,
                 "system.swing.value": chosenAttributeDie.roll + chosenAttributeDie.attribute.system.modifier
-            
             });
         }
         
@@ -473,6 +471,8 @@ export class Character extends Actor {
 
         this.update({
             "system.swing.attributeId": AttributeIdNoSwing,
+            "system.swing.d6roll": 0,
+            "system.swing.attributeBonus": 0,
             "system.swing.value": 0
         });
 
