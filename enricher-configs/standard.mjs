@@ -36,7 +36,7 @@ const lowPriorityPatterns = [
         },
     ],
     [
-        /[-\+]?(\d+(\.\d+)?\%?)?/, {
+        /[-\+]?\d+(\.\d+)?\%?|[-\+]/, {
             classes: ["numbers"],
             flags: "g",
             priority: -999,

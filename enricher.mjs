@@ -3,9 +3,7 @@ export class SentimentEnricher {
         console.log("Sentiment Enricher Registered");
     }
 
-    static #generatedPatterns = null;
-
-    generatePatterns() {
+    #generatePatterns() {
         // Gather pattern lists from environment variable rather than the import.
         // This should allow modules to add their own Pattern Lists to be processed
         // simply by extending this variable.
@@ -41,14 +39,14 @@ export class SentimentEnricher {
         // check if text has already been enriched before.
         // texts per uuid to minimize hash collisions.
         const hash = uuid + ":" + this.fnv1a52fast(text);
-        window.SentimentEnrichedTexts ??= {}; // ensure property exists
+        window.SentimentEnrichedTexts ??= {}; // ensure hash cache exists
         if (window.SentimentEnrichedTexts.hasOwnProperty(hash))
             return window.SentimentEnrichedTexts[hash];
 
         const re = new RegExp(/^\s*$/gi);
         if (re.test(text)) return text; // don't enrich empty text
 
-        const enricherConfig = this.generatePatterns();
+        const enricherConfig = this.#generatePatterns();
         const oldEnrichers = CONFIG?.TextEditor?.enrichers ?? [];
         CONFIG.TextEditor.enrichers.push(...enricherConfig);
         const enrichedText = await TextEditor.enrichHTML(
@@ -64,14 +62,14 @@ export class SentimentEnricher {
         return enrichedText;
     }
 
-    enrichNormal(pattern, enrOptions, textEditorOptions) {
+    enrichNormal(pattern, enrOptions) {
         const isolatedPattern = new RegExp(
             `${pattern.source}`,
             enrOptions.flags
         );
         return {
             pattern: isolatedPattern,
-            enricher: async (match, textEditorOptions) => {
+            enricher: async (match, _) => {
                 const printGroupNo = enrOptions?.printGroupNo ?? 0;
                 let thisMatch = match[printGroupNo];
                 let element = document.createElement("span");
@@ -134,8 +132,9 @@ export class SentimentEnricher {
     #htmlSanitize(string) {
         return string
             .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
+            .replace(/(?<!\\)</g, "&lt;") // -> \< becomes a normal <
+            .replace(/(?<!\\)>/g, "&gt;") //    same for \>
+                                          //     => \<br\> => <br>
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
