@@ -24,9 +24,12 @@ export default class GiftSheet extends ItemSheet {
     * @private
     */
     async #populateDescription(context) {
-        context.descriptionHTML = await TextEditor.enrichHTML(context.data.system.description, {
-            secrets: this.document.isOwner,
-            async: true
+        context.descriptionHTML = await CONFIG.Sentiment.Enricher.enrich(
+            context.data.system.description,
+            this?.object?.uuid ?? "unknown-object",
+            {
+                secrets: this.document.isOwner,
+                async: true
         });
     } 
 }

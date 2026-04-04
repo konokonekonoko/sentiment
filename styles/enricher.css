@@ -1,0 +1,41 @@
+/* English Keywords */
+.er-ignite {
+  color: #d95302;
+  font-weight: bold;
+}
+.er-lock {
+  color: #a37a00;
+  font-weight: bold;
+}
+.er-wound {
+  color: #f00000;
+  font-weight: bold;
+}
+
+.er-affinity,
+.er-attribute {
+  font-weight: bold;
+}
+
+.er-rolltodo {
+  /* d20 */
+}
+.er-rolltodye {
+  /* d6 */
+}
+
+
+/* Markdown */
+.er-italics {
+  font-style: italic;
+}
+
+.er-bold {
+  font-weight: bold;
+}
+
+
+/* Standard */
+.er-dicenotation {
+  color: purple;
+}

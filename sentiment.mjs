@@ -17,6 +17,9 @@ import CharacterSheet from "./sheets/character-sheet.mjs";
 import { CustomRollData } from "./documents/custom-roll.mjs";
 import CustomRollSheet from "./sheets/custom-roll-sheet.mjs";
 
+import EnricherConfigs from "./enricher-configs/index.mjs";
+import { SentimentEnricher } from "./enricher.mjs";
+
 import {
     RollTypes,
     AttributeStatus,
@@ -38,8 +41,13 @@ Hooks.once("init", async function () {
         RollTypes,
         AttributeStatus,
         AttributeStatusStrings,
-        AttributeIdNoSwing
+        AttributeIdNoSwing,
     };
+
+    // TODO once system settings are merged in, add toggles for every
+    // pattern set found in `EnricherConfigs`
+    CONFIG.Sentiment.EnricherConfigs = EnricherConfigs;
+    CONFIG.Sentiment.Enricher = new SentimentEnricher();
 
     Items.unregisterSheet("core", ItemSheet);
     Items.registerSheet("sentiment", AttributeSheet, {

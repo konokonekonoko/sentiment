@@ -19,7 +19,10 @@
     }
   ],
   "esmodules": [ "sentiment.mjs" ],
-  "styles": [ "styles/sentiment.css" ],
+  "styles": [
+    "styles/sentiment.css",
+    "styles/enricher.css"
+  ],
   "gridDistance": 5,
   "gridUnits": "ft"
 }
