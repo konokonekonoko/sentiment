@@ -134,7 +134,8 @@ export class SentimentEnricher {
             .replace(/&/g, "&amp;")
             .replace(/(?<!\\)</g, "&lt;") // -> \< becomes a normal <
             .replace(/(?<!\\)>/g, "&gt;") //    same for \>
-                                          //     => \<br\> => <br>
+            .replace(/\\</g, "<")         //     => \<br\> => <br>
+            .replace(/\\>/g, ">")  
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
