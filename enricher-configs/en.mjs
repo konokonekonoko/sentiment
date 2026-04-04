@@ -15,8 +15,17 @@ const lowPriorityPatterns = [
         },
     ],
     [
-        /LOCK(ING|ED)?( (OUT|IN(TO)?))?/, {
+        /LOCK(ING|ED)?( ?OUT)?/, {
             classes: ["lock"],
+            flags: "g",
+            strFormat: {
+                case: "title",
+            },
+        },
+    ],
+    [
+        /EXHAUST(ED)?/, {
+            classes: ["exhaust"],
             flags: "g",
             strFormat: {
                 case: "title",
@@ -42,9 +51,27 @@ const lowPriorityPatterns = [
         },
     ],
     [
+        /PRIMARY/, {
+            classes: ["primary"],
+            flags: "g",
+            strFormat: {
+                case: "title",
+            },
+        },
+    ],
+    [
+        /LINKS?/, {
+            classes: ["link"],
+            flags: "g",
+            strFormat: {
+                case: "title",
+            },
+        },
+    ],
+    [
         /ATTRIBUTES?/, {
             classes: ["attribute"],
-            flags: "gi",
+            flags: "g",
             strFormat: {
                 case: "title",
             },

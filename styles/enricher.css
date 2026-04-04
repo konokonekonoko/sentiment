@@ -1,27 +1,31 @@
 /* English Keywords */
 .er-ignite {
   color: #d95302;
-  font-weight: bold;
 }
-.er-lock {
+
+.er-lock,
+.er-exhaust {
   color: #a37a00;
-  font-weight: bold;
 }
+
 .er-wound {
   color: #f00000;
   font-weight: bold;
 }
 
+.er-link {
+  color: #1b00b6;
+}
+
 .er-affinity,
-.er-attribute {
+.er-primary {
   font-weight: bold;
 }
 
-.er-rolltodo {
-  /* d20 */
-}
-.er-rolltodye {
-  /* d6 */
+.er-rolltodo,
+.er-rolltodye,
+.er-attribute {
+  font-style: italic;
 }
 
 
@@ -37,5 +41,13 @@
 
 /* Standard */
 .er-dicenotation {
+  font-style: italic;
+  font-weight: bold;
   color: purple;
+}
+
+.er-numbers {
+  font-style: italic;
+  font-weight: bold;
+  opacity: 0.9;
 }

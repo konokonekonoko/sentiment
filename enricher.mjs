@@ -115,18 +115,18 @@ export class SentimentEnricher {
             const catA = getCategory(priA);
             const catB = getCategory(priB);
 
-            // Sort by category: positive > none > negative
+            // sort by category: positive > none > negative
             if (catA !== catB) {
                 return catB - catA;
             }
 
-            // Same category -> sort within the group
+            // same category -> sort within the group
             // if both no priority, leave this order
             if (priA === null && priB === null) {
                 return 0; // keep original relative order
             }
 
-            // Both have priority -> sort by value descending
+            // both have priority -> sort by value descending
             return priB - priA;
         });
     }
@@ -140,7 +140,7 @@ export class SentimentEnricher {
             .replace(/'/g, "&#039;");
     }
 
-    // Various string formatting operations for the match
+    // various string formatting operations for the match
     #strFormat(string, options) {
         const fmt = options.strFormat;
         if (fmt.hasOwnProperty("case")) {
