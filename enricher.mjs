@@ -25,7 +25,6 @@ export class SentimentEnricher {
                 continue;
             }
 
-            console.log("AAAAA",list.patterns.filter(p => !p?.[1]?.special))
             // TODO check if list is enabled once system settings have been merged in
             list.patterns.forEach(p => {
                 if (p?.[1]?.special) {
@@ -45,7 +44,6 @@ export class SentimentEnricher {
         for (const [pattern, options] of sortedPatterns) {
             assembledPatterns.add(this.#buildEnricherPattern(pattern, options));
         }
-        console.log("assembledPatterns",assembledPatterns)
 
         return [assembledPatterns, special];
     }
@@ -100,7 +98,6 @@ export class SentimentEnricher {
         return {
             pattern: isolatedPattern,
             enricher: async (match, _) => {
-                // console.log(isolatedPattern, match[0],match)
                 const printGroupNo = enrOptions?.printGroupNo ?? 0;
                 let thisMatch = match[printGroupNo];
                 let element = document.createElement("span");
