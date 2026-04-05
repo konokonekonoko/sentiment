@@ -10,7 +10,7 @@ export class SentimentEnricher {
         const patternLists = CONFIG.Sentiment.EnricherConfigs;
 
         const patterns = new Set();
-        const special = new Set();
+        const prePostProcessors = new Set();
 
         for (const [name, list] of Object.entries(patternLists)) {
             if (
@@ -27,25 +27,28 @@ export class SentimentEnricher {
 
             // TODO check if list is enabled once system settings have been merged in
             list.patterns.forEach(p => {
-                if (p?.[1]?.special) {
-                    special.add(p);
-                } else {
-                    patterns.add(p);
-                }
+                patterns.add(p);
             });
+            
+            if (!list.hasOwnProperty("prePostProcessors")) continue;
+            list.prePostProcessors.forEach(p => {
+                prePostProcessors.add(p);
+            });
+
         }
 
         // sort patterns by priority.
         // this is probably expensive, but since we're only running it once for every
         // text thanks to the hash check in `this.enrich`, it should be fine.
         const sortedPatterns = this.#sortByPriority([...patterns]);
+        const sortedPrePostProcessors = this.#sortByPriority([...prePostProcessors]);
 
         const assembledPatterns = new Set();
         for (const [pattern, options] of sortedPatterns) {
             assembledPatterns.add(this.#buildEnricherPattern(pattern, options));
         }
 
-        return [assembledPatterns, special];
+        return [assembledPatterns, sortedPrePostProcessors];
     }
 
     async enrich(text, uuid = "", textEditorOptions = {}) {
@@ -65,10 +68,10 @@ export class SentimentEnricher {
         const oldEnrichers = CONFIG?.TextEditor?.enrichers ?? [];
 
         // pre-process special rules
-        let preProcessed
+        let preProcessOutput
         if (specialRules.length) {
-            preProcessed = this.#preProcessSpecialRules(text, specialRules);
-            text = preProcessed.processedText
+            preProcessOutput = this.#preProcessSpecialRules(text, specialRules);
+            text = preProcessOutput.text;
         }
 
         CONFIG.TextEditor.enrichers.push(...enricherConfig);
@@ -78,8 +81,10 @@ export class SentimentEnricher {
         );
 
         // post-process special rules
+        let postProcessedOutput
         if (specialRules.length) {
-            enrichedText = this.#postProcessSpecialRules(enrichedText, specialRules, preProcessed);
+            postProcessedOutput = this.#postProcessSpecialRules(enrichedText, specialRules, preProcessOutput);
+            enrichedText = postProcessedOutput.text;
         }
 
         // restore previous enricher state
@@ -196,54 +201,38 @@ export class SentimentEnricher {
         return string;
     }
 
-    #preProcessSpecialRules(text, specialRules, oldEnrichers) {
-        // Helpers
-        function replaceEscapeGroup(text, pattern, options) {
-            const placeholderMap = new Map();
-            const processedText = text.replace(
-                new RegExp(
-                    `${pattern.source}`,
-                    options.flags
-                ),
-                (_, innerText) => {
-                    const placeholder = `<span data-placeholderid="${foundry.utils.randomID(24)}"></span>`;
-                    placeholderMap.set(placeholder, innerText);
-                    return placeholder;
-                }
-            );
-            return { processedText, placeholderMap }
-        }
+    #preProcessSpecialRules(text, specialRules) {
+        const preProcessOutput = { text }
 
-        // process rules
+        // process preprocess options defined in options object
         for (const [pattern, options] of specialRules) {
-            switch (options.special) {
-                case "escape-group":
-                    return replaceEscapeGroup(text, pattern, options)
-                default:
-                    console.error("Unknown special command:",rule)
-            }
+            if (!options.hasOwnProperty("preProcess")) continue;
+            foundry.utils.mergeObject(preProcessOutput,
+                options.preProcess({
+                    text: preProcessOutput.text,
+                    pattern,
+                    options
+                })
+            )
         }
+        return preProcessOutput;
     }
 
-    #postProcessSpecialRules(text, specialRules, preProcessed) {
-        // Helpers
-        function replaceEscapeGroup(text, preProcessed) {
-
-            preProcessed.placeholderMap.forEach((innerText, placeholder) => {
-                text = text.replaceAll(placeholder, innerText);
-            });
-            return text
-        }
-
-        // process rules
+    #postProcessSpecialRules(text, specialRules, preProcessOutput) {
+        const postProcessOutput = { text, preProcessOutput }
+        // process preprocess options defined in options object
         for (const [pattern, options] of specialRules) {
-            switch (options.special) {
-                case "escape-group":
-                    return replaceEscapeGroup(text, preProcessed)
-                default:
-                    console.error("Unknown special command:",rule)
-            }
+            if (!options.hasOwnProperty("postProcess")) continue;
+            foundry.utils.mergeObject(postProcessOutput,
+                options.postProcess({
+                    text: postProcessOutput.text,
+                    pattern,
+                    options,
+                    preProcessOutput
+                })
+            )
         }
+        return postProcessOutput;
     }
 
     fnv1a52fast(str) {

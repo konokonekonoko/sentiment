@@ -27,23 +27,15 @@
 //                      matched element.
 // }
 
+// Simple Formatting Patterns
 const patterns = [
-    [
-        // Anything wrapped in {{{ }}} will be excluded from ALL enriching.
-        /\{\{\{([\s\S]*?)\}\}\}/, {
-            special: "escape-group",
-            classes: ["escape"],
-            flags: "gis",
-            printGroupNo: 1,
-        }
-    ],
     [
         /\d+d\d+(k[hl]\d+)?/, {
             classes: ["dicenotation"],
             flags: "gi",
         }
     ],
-    
+
     // known issue: for some reason that still eludes me after 3 hours of debugging,
     // this rule and the one below are applied one more time every time the enriched text
     // is saved with changes. Resets to the normal amount on reload.
@@ -62,11 +54,57 @@ const patterns = [
             flags: "gi",
         }
     ],
-
 ];
+
+// Pre and Post Processors
+const prePostProcessors = [
+    [
+        // Anything wrapped in {{{ }}} will be excluded from ALL enriching.
+        /\{\{\{([\s\S]*?)\}\}\}/, {
+            flags: "gis",
+            preProcess: groupEscapePre,
+            postProcess: groupEscapePost,
+        }
+    ],
+]
+
+function groupEscapePre({
+        text,
+        pattern,
+        options
+    } = {}) {
+    const placeholderMap = new Map();
+    const processedText = text.replace(
+        new RegExp(
+            `${pattern.source}`,
+            options.flags
+        ),
+        (_, innerText) => {
+            const placeholder = `<span data-placeholderid="${foundry.utils.randomID(24)}"></span>`;
+            placeholderMap.set(placeholder, innerText);
+            return placeholder;
+        }
+    );
+    return { text: processedText, groupEscape: { placeholderMap } }
+}
+
+function groupEscapePost({
+        text,
+        pattern,
+        options,
+        preProcessOutput
+    } = {}) {
+        if (!preProcessOutput.hasOwnProperty("groupEscape")) return;
+        preProcessOutput.groupEscape.placeholderMap.forEach((innerText, placeholder) => {
+            text = text.replaceAll(placeholder, innerText);
+        });
+    return { text, preProcessOutput, groupEscape: {} }
+}
+
 
 const output = {
     displayName: "Standard Syntax Highlighting",
     patterns,
+    prePostProcessors
 };
 export default output;
