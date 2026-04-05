@@ -30,9 +30,8 @@
 // Simple Formatting Patterns
 const patterns = [
     [
-        /\d+d\d+(k[hl]\d+)?/, {
+        /\d+d\d+(k[hl]\d+)?/gi, {
             classes: ["dicenotation"],
-            flags: "gi",
         }
     ],
 
@@ -42,16 +41,14 @@ const patterns = [
     // replaceParent: true currenty keeps the tag spaghetti at bay, and keeps the styling
     // consistent for now, but I need to figure out why it does that.
     [
-        /[-\+]? ?\d+(\.\d+)?\%?/, {
+        /[-\+]? ?\d+(\.\d+)?\%?/g, {
             classes: ["numbers"],
-            flags: "g",
             priority: -999,
         }
     ],
     [
-        /\+ ?the level of this gift/, {
+        /\+ ?the level of this gift/gi, {
             classes: ["numbers"],
-            flags: "gi",
         }
     ],
 ];
@@ -60,8 +57,7 @@ const patterns = [
 const prePostProcessors = [
     [
         // Anything wrapped in {{{ }}} will be excluded from ALL enriching.
-        /\{\{\{([\s\S]*?)\}\}\}/, {
-            flags: "gis",
+        /\{\{\{([\s\S]*?)\}\}\}/gis, {
             preProcess: groupEscapePre,
             postProcess: groupEscapePost,
         }

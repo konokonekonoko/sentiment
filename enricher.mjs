@@ -96,12 +96,8 @@ export class SentimentEnricher {
     }
 
     #buildEnricherPattern(pattern, enrOptions) {
-        const isolatedPattern = new RegExp(
-            `${pattern.source}`,
-            enrOptions.flags
-        );
         return {
-            pattern: isolatedPattern,
+            pattern,
             enricher: async (match, _) => {
                 const printGroupNo = enrOptions?.printGroupNo ?? 0;
                 let thisMatch = match[printGroupNo];
