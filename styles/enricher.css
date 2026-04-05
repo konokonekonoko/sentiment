@@ -1,0 +1,13 @@
+/* Standard */
+.er-dicenotation {
+  font-weight: bold;
+  color: rgb(37, 64, 139);
+}
+.er-dicenotation .er-numbers {
+  opacity: 1 !important;
+}
+
+.er-numbers {
+  font-weight: bold;
+  opacity: 0.8;
+}
