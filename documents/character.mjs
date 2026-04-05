@@ -284,6 +284,8 @@ export class Character extends Actor {
             rollType: "recoveryRoll",
             totalStrategy: this.#totalAllAttributeRollsAndModifiers,
         }
+        
+        await this.#releaseAttributesFromLockout();
         const rollToDyeTotal = await this.#rollToDyeImpl({
             options: rollToDyeOptions,
             additionalDiceFormula,
@@ -428,9 +430,14 @@ export class Character extends Actor {
     * Restore all locked-out attributes to normal status.
     * @private
     */
-    #releaseAttributesFromLockout() {
-        this.getAttributes().filter((attribute) => attribute.system.status === AttributeStatus.LockedOut).forEach((lockedOutAttribute) =>
-            lockedOutAttribute.update({ "system.status": AttributeStatus.Normal })
+    async #releaseAttributesFromLockout() {
+        const lockedOutAttributes = this.getAttributes()
+            .filter((attribute) => attribute.system.status === AttributeStatus.LockedOut);
+        if (lockedOutAttributes.length === 0) return;
+        await Promise.all(
+            lockedOutAttributes.map((lockedOutAttribute) =>
+                lockedOutAttribute.update({ "system.status": AttributeStatus.Normal })
+            )
         );
     }
 
