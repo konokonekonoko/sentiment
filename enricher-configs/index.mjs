@@ -1,12 +1,8 @@
 import standard from "./standard.mjs";
-import markdown from "./markdown.mjs";
-import en from "./en.mjs";
 
-// Collect all system internal provided pattern files in one export for easier handling.
+// Collect all system internal provided pattern files in one export for easy handling.
 // Highest to lowest priority
-const patterns = {
-    standard,
-    markdown,
-    en,
+const output = {
+    standard
 }
-export default patterns
+export default output

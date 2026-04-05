@@ -1,8 +1,7 @@
 // Patterns are written in order of highest to lowest priority. Priority
 // can optionally be overwritten by adding a "priority" property to the pattern's
 // object. Default priority is 0.
-// Patterns will be sorted according to their priority value INSIDE their
-// priority group (lowPriorityPatterns or highPriorityPatterns)
+// Patterns will be sorted according to their priority value.
 //
 // Lower priority patterns might get overwritten by higher priority ones.
 // Generally, you want "large" matching groups to have a high priority.
@@ -28,33 +27,46 @@
 //                      matched element.
 // }
 
-const lowPriorityPatterns = [
+const patterns = [
+    [
+        // Anything wrapped in {{{ }}} will be excluded from ALL enriching.
+        /\{\{\{([\s\S]*?)\}\}\}/, {
+            special: "escape-group",
+            classes: ["escape"],
+            flags: "gis",
+            printGroupNo: 1,
+        }
+    ],
     [
         /\d+d\d+(k[hl]\d+)?/, {
             classes: ["dicenotation"],
             flags: "gi",
-        },
+        }
     ],
+    
+    // known issue: for some reason that still eludes me after 3 hours of debugging,
+    // this rule and the one below are applied one more time every time the enriched text
+    // is saved with changes. Resets to the normal amount on reload.
+    // replaceParent: true currenty keeps the tag spaghetti at bay, and keeps the styling
+    // consistent for now, but I need to figure out why it does that.
     [
-        /[-\+]?\d+(\.\d+)?\%?|[-\+]/, {
+        /[-\+]? ?\d+(\.\d+)?\%?/, {
             classes: ["numbers"],
             flags: "g",
             priority: -999,
-        },
+        }
     ],
     [
         /\+ ?the level of this gift/, {
             classes: ["numbers"],
             flags: "gi",
-        },
+        }
     ],
+
 ];
 
-const highPriorityPatterns = [];
-
-const patterns = {
+const output = {
     displayName: "Standard Syntax Highlighting",
-    lowPriorityPatterns,
-    highPriorityPatterns,
+    patterns,
 };
-export default patterns;
+export default output;

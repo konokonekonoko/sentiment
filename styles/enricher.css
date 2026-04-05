@@ -1,53 +1,13 @@
-/* English Keywords */
-.er-ignite {
-  color: #d95302;
-}
-
-.er-lock,
-.er-exhaust {
-  color: #a37a00;
-}
-
-.er-wound {
-  color: #f00000;
-  font-weight: bold;
-}
-
-.er-link {
-  color: #1b00b6;
-}
-
-.er-affinity,
-.er-primary {
-  font-weight: bold;
-}
-
-.er-rolltodo,
-.er-rolltodye,
-.er-attribute {
-  font-style: italic;
-}
-
-
-/* Markdown */
-.er-italics {
-  font-style: italic;
-}
-
-.er-bold {
-  font-weight: bold;
-}
-
-
 /* Standard */
 .er-dicenotation {
-  font-style: italic;
   font-weight: bold;
-  color: purple;
+  color: rgb(37, 64, 139);
+}
+.er-dicenotation .er-numbers {
+  opacity: 1 !important;
 }
 
 .er-numbers {
-  font-style: italic;
   font-weight: bold;
-  opacity: 0.9;
+  opacity: 0.8;
 }

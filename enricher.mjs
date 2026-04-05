@@ -9,28 +9,45 @@ export class SentimentEnricher {
         // simply by extending this variable.
         const patternLists = CONFIG.Sentiment.EnricherConfigs;
 
-        const lowPriorityPatterns = [];
-        const highPriorityPatterns = [];
+        const patterns = new Set();
+        const special = new Set();
 
         for (const [name, list] of Object.entries(patternLists)) {
+            if (
+                !list.hasOwnProperty("patterns") ||
+                !list.hasOwnProperty("displayName")
+            ) {
+                console.error(
+                    `Sentiment Enricher Extension "${name}" does not `+
+                    `provide a pattern list in the expected format:`,
+                    list
+                );
+                continue;
+            }
+
+            console.log("AAAAA",list.patterns.filter(p => !p?.[1]?.special))
             // TODO check if list is enabled once system settings have been merged in
-            lowPriorityPatterns.push(...list.lowPriorityPatterns);
-            highPriorityPatterns.push(...list.highPriorityPatterns);
+            list.patterns.forEach(p => {
+                if (p?.[1]?.special) {
+                    special.add(p);
+                } else {
+                    patterns.add(p);
+                }
+            });
         }
 
         // sort patterns by priority.
         // this is probably expensive, but since we're only running it once for every
         // text thanks to the hash check in `this.enrich`, it should be fine.
-        const sortedPatterns = [
-            ...this.#sortByPriority(highPriorityPatterns),
-            ...this.#sortByPriority(lowPriorityPatterns),
-        ];
+        const sortedPatterns = this.#sortByPriority([...patterns]);
 
-        const assembledPatterns = [];
+        const assembledPatterns = new Set();
         for (const [pattern, options] of sortedPatterns) {
-            assembledPatterns.push(this.enrichNormal(pattern, options));
+            assembledPatterns.add(this.#buildEnricherPattern(pattern, options));
         }
-        return assembledPatterns;
+        console.log("assembledPatterns",assembledPatterns)
+
+        return [assembledPatterns, special];
     }
 
     async enrich(text, uuid = "", textEditorOptions = {}) {
@@ -46,13 +63,26 @@ export class SentimentEnricher {
         const re = new RegExp(/^\s*$/gi);
         if (re.test(text)) return text; // don't enrich empty text
 
-        const enricherConfig = this.#generatePatterns();
+        const [enricherConfig, specialRules] = this.#generatePatterns();
         const oldEnrichers = CONFIG?.TextEditor?.enrichers ?? [];
+
+        // pre-process special rules
+        let preProcessed
+        if (specialRules.length) {
+            preProcessed = this.#preProcessSpecialRules(text, specialRules);
+            text = preProcessed.processedText
+        }
+
         CONFIG.TextEditor.enrichers.push(...enricherConfig);
-        const enrichedText = await TextEditor.enrichHTML(
+        let enrichedText = await TextEditor.enrichHTML(
             text,
             textEditorOptions
         );
+
+        // post-process special rules
+        if (specialRules.length) {
+            enrichedText = this.#postProcessSpecialRules(enrichedText, specialRules, preProcessed);
+        }
 
         // restore previous enricher state
         CONFIG.TextEditor.enrichers = oldEnrichers;
@@ -62,7 +92,7 @@ export class SentimentEnricher {
         return enrichedText;
     }
 
-    enrichNormal(pattern, enrOptions) {
+    #buildEnricherPattern(pattern, enrOptions) {
         const isolatedPattern = new RegExp(
             `${pattern.source}`,
             enrOptions.flags
@@ -70,6 +100,7 @@ export class SentimentEnricher {
         return {
             pattern: isolatedPattern,
             enricher: async (match, _) => {
+                // console.log(isolatedPattern, match[0],match)
                 const printGroupNo = enrOptions?.printGroupNo ?? 0;
                 let thisMatch = match[printGroupNo];
                 let element = document.createElement("span");
@@ -93,7 +124,7 @@ export class SentimentEnricher {
                     enrOptions.classes.map((word) => "er-" + word).join(" ");
                 return element;
             },
-            replaceParent: false,
+            replaceParent: true,
         };
     }
 
@@ -166,6 +197,56 @@ export class SentimentEnricher {
         }
 
         return string;
+    }
+
+    #preProcessSpecialRules(text, specialRules, oldEnrichers) {
+        // Helpers
+        function replaceEscapeGroup(text, pattern, options) {
+            const placeholderMap = new Map();
+            const processedText = text.replace(
+                new RegExp(
+                    `${pattern.source}`,
+                    options.flags
+                ),
+                (_, innerText) => {
+                    const placeholder = `<span data-placeholderid="${foundry.utils.randomID(24)}"></span>`;
+                    placeholderMap.set(placeholder, innerText);
+                    return placeholder;
+                }
+            );
+            return { processedText, placeholderMap }
+        }
+
+        // process rules
+        for (const [pattern, options] of specialRules) {
+            switch (options.special) {
+                case "escape-group":
+                    return replaceEscapeGroup(text, pattern, options)
+                default:
+                    console.error("Unknown special command:",rule)
+            }
+        }
+    }
+
+    #postProcessSpecialRules(text, specialRules, preProcessed) {
+        // Helpers
+        function replaceEscapeGroup(text, preProcessed) {
+
+            preProcessed.placeholderMap.forEach((innerText, placeholder) => {
+                text = text.replaceAll(placeholder, innerText);
+            });
+            return text
+        }
+
+        // process rules
+        for (const [pattern, options] of specialRules) {
+            switch (options.special) {
+                case "escape-group":
+                    return replaceEscapeGroup(text, preProcessed)
+                default:
+                    console.error("Unknown special command:",rule)
+            }
+        }
     }
 
     fnv1a52fast(str) {
