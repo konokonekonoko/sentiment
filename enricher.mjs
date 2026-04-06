@@ -65,7 +65,6 @@ export class SentimentEnricher {
         if (re.test(text)) return text; // don't enrich empty text
 
         const [enricherConfig, specialRules] = this.#generatePatterns();
-        const oldEnrichers = CONFIG?.TextEditor?.enrichers ?? [];
 
         // pre-process special rules
         let preProcessOutput
@@ -88,7 +87,7 @@ export class SentimentEnricher {
         }
 
         // restore previous enricher state
-        CONFIG.TextEditor.enrichers = oldEnrichers;
+        CONFIG.TextEditor.enrichers = CONFIG.TextEditor.enrichers.filter(e => !enricherConfig.has(e));
 
         // add enriched text and hash to cache
         window.SentimentEnrichedTexts[hash] = enrichedText;
