@@ -75,15 +75,6 @@ Hooks.once("init", async function () {
         "systems/sentiment/templates/partials/gift-list.html",
         "systems/sentiment/templates/partials/swing.html"
     ]);
-
-    // Utility Globals
-    window.selectedActor = function () {
-        const selected = canvas.tokens.controlled[0]
-        if (!selected) return
-        const actor = selected.actor
-        if (!actor) return
-        return actor;
-    }
 });
 
 Hooks.on("hotbarDrop", (bar, data, slot) => tryCreateCharacterMacro(data, slot));

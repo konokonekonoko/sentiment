@@ -465,7 +465,7 @@ export class Character extends Actor {
             type: rollType,
             total,
             rollTrigger,
-            success: total > rollTrigger?.toHit, // I don't remember if its greater-equal or greater-than for a success
+            success: total >= rollTrigger?.toHit, // defender wins ties
         };
 
         if (swingAttributeDie !== null) {
