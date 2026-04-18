@@ -434,8 +434,11 @@ export class Character extends Actor {
 
             for (let attributeDie of attributeDice) {
                 const swingValue = attributeDie.roll + attributeDie.attribute.system.modifier;
+                const descriptiveName = attributeDie.attribute.system.descriptiveName
                 buttons[attributeDie.attribute._id] = {
-                    label: attributeDie.attribute.name + ": " + swingValue,
+                    label: attributeDie.attribute.name + 
+                        (descriptiveName ? ` (${descriptiveName}): ` : ": ") + 
+                        swingValue,
                     callback: () => { resolve(attributeDie) }
                 }
             }
@@ -447,7 +450,7 @@ export class Character extends Actor {
                 close: () => { resolve(null) }
             };
 
-            new Dialog(chooseSwingDialog).render(true);
+            new Dialog(chooseSwingDialog,{classes: ["dialog","vertical-buttons"]}).render(true);
         });
     }
 
