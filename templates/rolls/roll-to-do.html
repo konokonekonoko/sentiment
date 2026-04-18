@@ -9,10 +9,10 @@
                     <li class="roll die d6">{{d6Roll}}</li>
                     {{/if}}
                     {{#if attributeModifier}}
-                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">{{attributeModifier}}</li>
+                    <li class="roll die attribute-modifier-die" data-attribute-tooltip="{{attribute.parent.uuid}}:{{attribute.uuid}}" style="background-color:{{attributeBackgroundColor attribute}}">{{attributeModifier}}</li>
                     {{/if}}
                     {{#if swingValue}}
-                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">{{swingValue}}</li>
+                    <li class="roll die attribute-modifier-die" data-attribute-tooltip="{{attribute.parent.uuid}}:{{attribute.uuid}}" style="background-color:{{attributeBackgroundColor attribute}}">{{swingValue}}</li>
                     {{/if}}
                 </ol>
             </div>
@@ -58,7 +58,7 @@
             {{/if}}
             <div class="roll-to-do-results">
                 <h4 class="dice-total roll-to-do-result">To Hit: {{toHit}}</h4>
-                <h4 class="dice-total roll-to-do-result" {{#if attribute}} style="background-color:{{attributeBackgroundColor attribute}}" {{/if}}>Effect: {{effect}}</h4>
+                <h4 class="dice-total roll-to-do-result" {{#if attribute}} data-attribute-tooltip="{{attribute.parent.uuid}}:{{attribute.uuid}}" style="background-color:{{attributeBackgroundColor attribute}}" {{/if}}>Effect: {{effect}}</h4>
             </div>
         </div>
     </div>

@@ -98,7 +98,8 @@ async function handleTakeDamagePrompt(actor, damageString) {
 
 export function onRenderChatMessage(app, html, data) {
     html = jqueryHTMLhandler(html);
-    _hideChatElement(app, html, data);
+    _hideChatElement(app, html);
+    hideAttributeTooltipDescriptions(app, html)
 }
 
 /**
@@ -140,4 +141,25 @@ async function _hideChatElement(_, html) {
             element.style.display = "none";
         }
     });
+}
+
+async function hideAttributeTooltipDescriptions(app, html) {
+    const attributeTooltips = html.querySelectorAll("[data-attribute-tooltip]");
+
+    for (const element of attributeTooltips) {
+        const [actorUuid, attributeUuid] = element.dataset.attributeTooltip.split(":");
+        const actor = await fromUuid(actorUuid);
+        const attribute = await fromUuid(attributeUuid);
+
+        if (!actor || !attribute) return;
+
+        // only show color for non-owners
+        if (actor && !actor?.isOwner && !game.user.isGM) {
+            element.setAttribute("data-tooltip", `${attribute.name}`);
+        }
+        // show color and descriptive name for owners
+        else {
+            element.setAttribute("data-tooltip", `${attribute.name}: ${attribute.system.descriptiveName}`);
+        }
+    };
 }
