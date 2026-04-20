@@ -5,7 +5,7 @@
             {{#each attributeDice as |attributeDie|}}
             <div class="dice">
                 <ol class="dice-rolls"
-                    data-attribute-tooltip="{{attributeDie.attribute.parent.uuid}}:{{attributeDie.attribute.uuid}}"
+                    data-attribute-tooltip="{{attributeDie.attribute.parent.uuid}}:{{attributeDie.attribute.id}}"
                     >
                     {{#if (isStatusNormal attributeDie.attribute)}}
                     <li class="roll die d6">{{attributeDie.roll}}</li>

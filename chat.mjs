@@ -55,8 +55,8 @@ async function _onAction(event) {
             }
             await selectedActor.recoveryRoll({
                 rollTrigger: {
-                    type: "wound"
-                }
+                    type: "wound",
+                },
             });
             break;
         case "roll-custom":
@@ -79,7 +79,7 @@ async function _onAction(event) {
                 return false;
             }
             if (selectedActor.getUnwoundedAttributes().length) {
-                await selectedActor.woundAttributeDialog({toChat: true});
+                await selectedActor.woundAttributeDialog({ toChat: true });
             }
             break;
         default:
@@ -99,7 +99,7 @@ async function handleTakeDamagePrompt(actor, damageString) {
 export function onRenderChatMessage(app, html, data) {
     html = jqueryHTMLhandler(html);
     _hideChatElement(app, html);
-    hideAttributeTooltipDescriptions(app, html)
+    hideAttributeTooltipDescriptions(app, html);
 }
 
 /**
@@ -143,23 +143,35 @@ async function _hideChatElement(_, html) {
     });
 }
 
-async function hideAttributeTooltipDescriptions(app, html) {
+async function hideAttributeTooltipDescriptions(_, html) {
     const attributeTooltips = html.querySelectorAll("[data-attribute-tooltip]");
 
+    let actor
     for (const element of attributeTooltips) {
-        const [actorUuid, attributeUuid] = element.dataset.attributeTooltip.split(":");
-        const actor = await fromUuid(actorUuid);
-        const attribute = await fromUuid(attributeUuid);
+        const [actorUuid, attributeId] = element.dataset.attributeTooltip.split(":");
+        if (!actor && actorUuid) {
+            actor = await fromUuid(actorUuid);  // could switch to fromUuidSync if we don't
+        }                                       // care about the edge case of edge cases of
+        if (!actor || !attributeId) continue;   // rolling from the compendium.
 
-        if (!actor || !attribute) return;
+        const attribute = actor.items?.get(attributeId);
+        if (!attribute || attribute.type !== "attribute") continue;
+
+        const colorName = attribute.name;
+        const descriptiveName = attribute.system.descriptiveName;
 
         // only show color for non-owners
-        if (actor && !actor?.isOwner && !game.user.isGM) {
-            element.setAttribute("data-tooltip", `${attribute.name}`);
+        if (actor && !actor.isOwner && !game.user.isGM) {
+            element.setAttribute("data-tooltip", colorName);
         }
         // show color and descriptive name for owners
         else {
-            element.setAttribute("data-tooltip", `${attribute.name}: ${attribute.system.descriptiveName}`);
+            element.setAttribute(
+                "data-tooltip",
+                `${colorName}${
+                    descriptiveName ? `: ${descriptiveName}` : ``
+                }`
+            );
         }
-    };
+    }
 }
