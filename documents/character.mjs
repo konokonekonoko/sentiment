@@ -434,7 +434,7 @@ export class Character extends Actor {
 
             for (let attributeDie of attributeDice) {
                 const swingValue = attributeDie.roll + attributeDie.attribute.system.modifier;
-                const descriptiveName = attributeDie.attribute.system.descriptiveName
+                const descriptiveName = attributeDie.attribute.system.descriptiveName;
                 buttons[attributeDie.attribute._id] = {
                     label: attributeDie.attribute.name + 
                         (descriptiveName ? ` (${descriptiveName}): ` : ": ") + 
