@@ -256,7 +256,7 @@ export class Character extends Actor {
             rollType: "rollToDye",
             totalStrategy: this.#totalAllAttributeRollsAndOnlySwingModifier,
         }
-        this.#rollToDyeImpl({
+        await this.#rollToDyeImpl({
             options: rollToDyeOptions,
             additionalDiceFormula,
             rollTrigger
