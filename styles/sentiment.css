@@ -245,6 +245,10 @@
 	line-height: 32px;
 }
 
+.dialog.vertical-buttons .dialog-buttons {
+	flex-direction: column;
+}
+
 .sentiment .dice-rolls .attribute-modifier-die,
 .sentiment .swing {
 	border-radius: 50%;
