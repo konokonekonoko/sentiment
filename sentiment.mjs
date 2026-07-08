@@ -7,6 +7,8 @@ import AttributeSheet from "./sheets/attribute-sheet.mjs";
 import { GiftData } from "./documents/gift.mjs";
 import GiftSheet from "./sheets/gift-sheet.mjs";
 
+import GiftAbility from "./documents/active-effect.mjs";
+
 import {
     AttributeIdNoSwing,
     CharacterData,
@@ -32,6 +34,7 @@ Hooks.once("init", async function () {
     CONFIG.Item.dataModels.attribute = AttributeData;
     CONFIG.Item.dataModels.gift = GiftData;
     CONFIG.Item.dataModels.customRoll = CustomRollData;
+    CONFIG.ActiveEffect.documentClass = GiftAbility;
     CONFIG.Actor.dataModels.character = CharacterData;
     CONFIG.Actor.documentClass = Character;
     CONFIG.Sentiment = {

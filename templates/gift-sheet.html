@@ -8,5 +8,32 @@
         <div class="description" data-group="primary" data-tab="description">
             {{editor descriptionHTML target="system.description" button=true owner=owner editable=editable engine="prosemirror"}}
         </div>
+
+        <hr>
+        <ol class="list ability-list">
+            {{#each abilites as |ability index|}}
+            <li class="ability list-item flexrow" data-item-id="{{ability._id}}">
+                <p class="ability-name ability-name-column">
+                    {{index}} {{ability.name}}<br>
+                    {{ability.description}}
+                </p>
+                <!-- <p class="ability-modifier-text ability-modifier-column">+{{ability.system.modifier}}</p>
+                <p class="ability-status ability-status-column">{{ability.statusString}}</p>
+                <div class="ability-status-controls ability-status-controls-column">
+                    {{#if ability.showRestoreButton}}<button class="button ability-restore" type="button" title="Restore">Restore</button>{{/if}}
+                    {{#if ability.showLockOutButton}}<button class="button ability-lock-out" type="button" title="Lock Out">Lock Out</button>{{/if}}
+                    {{#if ability.showWoundButton}}<button class="button ability-wound" type="button" title="Wound">Wound</button>{{/if}}
+                </div> -->
+                <div class="ability-controls ability-controls-column">
+                    <a class="ability-control ability-open" title="Open Ability"> <i class="fas fa-edit"></i> Open</a>
+                    <a class="ability-control ability-delete" title="Delete Ability"> <i class="fas fa-trash"></i> Delete</a>
+                </div>
+            </li>
+            {{/each}}
+        </ol>
+        <p>
+            <a class="ability-control ability-add" title="Add New ability"><i class="fas fa-plus"></i> Add New ability</a>
+        </p>
+
     </section>
 </form>
