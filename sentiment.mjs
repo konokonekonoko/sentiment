@@ -7,7 +7,8 @@ import AttributeSheet from "./sheets/attribute-sheet.mjs";
 import { GiftData } from "./documents/gift.mjs";
 import GiftSheet from "./sheets/gift-sheet.mjs";
 
-import GiftAbility from "./documents/active-effect.mjs";
+import { GiftAbilityData } from "./documents/active-effect.mjs";
+import GiftAbilitySheet from "./sheets/gift-ability-sheet.mjs"
 
 import {
     AttributeIdNoSwing,
@@ -33,8 +34,8 @@ Hooks.once("init", async function () {
 
     CONFIG.Item.dataModels.attribute = AttributeData;
     CONFIG.Item.dataModels.gift = GiftData;
+    CONFIG.ActiveEffect.dataModels.giftAbility = GiftAbilityData;
     CONFIG.Item.dataModels.customRoll = CustomRollData;
-    CONFIG.ActiveEffect.documentClass = GiftAbility;
     CONFIG.Actor.dataModels.character = CharacterData;
     CONFIG.Actor.documentClass = Character;
     CONFIG.Sentiment = {
@@ -59,6 +60,13 @@ Hooks.once("init", async function () {
         types: ["customRoll"],
         makeDefault: true,
         label: "Custom Roll Sheet"
+    });
+
+    DocumentSheetConfig.unregisterSheet(ActiveEffect, "core", ActiveEffectConfig);
+    DocumentSheetConfig.registerSheet(ActiveEffect,"sentiment", GiftAbilitySheet, {
+        types: ["giftAbility"],
+        makeDefault: true,
+        label: "Gift Ability Sheet"
     });
 
     Actors.unregisterSheet("core", ActorSheet);

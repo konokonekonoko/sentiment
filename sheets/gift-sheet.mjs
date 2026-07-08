@@ -17,7 +17,12 @@ export default class GiftSheet extends ItemSheet {
     async getData(options) {
         const context = await super.getData(options);
 
+        context.effects = this.object.effects;
+
         await this.#populateDescription(context);
+        this.#populateAbilities(context);
+
+        console.log("gift getData", context)
         return context;
     }
 
@@ -32,21 +37,8 @@ export default class GiftSheet extends ItemSheet {
             return;
         }
 
-        // html.find(".attribute-restore").click(this.#onAttributeRestore.bind(this));
-        // html.find(".attribute-lock-out").click(this.#onAttributeLockOut.bind(this));
-        // html.find(".attribute-wound").click(this.#onAttributeWound.bind(this));
         html.find(".ability-add").click(this.#onAbilityAdd.bind(this));
         html.find(".ability-delete").click(this.#onAbilityDelete.bind(this));
-        // html.find(".gift-add").click(this.#onGiftAdd.bind(this));
-        // html.find(".gift-delete").click(this.#onGiftDelete.bind(this));
-        // html.find(".custom-roll-add").click(this.#onCustomRollAdd.bind(this));
-        // html.find(".custom-roll-open").click(this.#onCustomRollOpen.bind(this));
-        // html.find(".custom-roll-delete").click(this.#onCustomRollDelete.bind(this));
-        // html.find(".custom-roll-execute").click(this.#onCustomRollExecute.bind(this));
-        // html.find(".drop-swing").click(this.#onDropSwing.bind(this));
-        // html.find(".roll-to-do").click(this.#onRollToDo.bind(this));
-        // html.find(".roll-to-dye").click(this.#onRollToDye.bind(this));
-        // html.find(".recovery-roll").click(this.#onRecoveryRoll.bind(this));
 
         // this.#setDragDataOnButton(html, ".drop-swing", "dropSwing");
         // this.#setDragDataOnButton(html, ".roll-to-do", "rollToDo");
@@ -75,10 +67,10 @@ export default class GiftSheet extends ItemSheet {
         event.preventDefault();
         const effectData = {
             name: "New Ability",
-            type: "GiftAbility"
+            type: "giftAbility"
         };
 
-        return await ActiveEffect.create(effectData, { parent: this.actor });
+        return await ActiveEffect.create(effectData, { parent: this.item });
     }
 
     /**
@@ -91,6 +83,15 @@ export default class GiftSheet extends ItemSheet {
 
         const attribute = this.#getItemFromListEvent(event);
         attribute.deleteDialog();
+    }
+
+    #populateAbilities(context) {
+        context.abilities = [];
+        for (let item of context.effects) {
+            if (item.type == "attribute") {
+                context.attributes.push(item);
+            }
+        }
     }
 
     /**

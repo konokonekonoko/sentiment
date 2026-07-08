@@ -1,15 +1,15 @@
 import { GiftAbilityUnlocked } from "../enums.mjs"
 
-export default class GiftAbility extends ActiveEffect {
+export class GiftAbilityData extends ActiveEffect {
   static defineSchema() {
     const fields = foundry.data.fields;
     const schema = super.defineSchema();
     return {
       ...schema,
-      type: fields.StringField({
-        initial: "",
-        required: true,
-      }),
+      // type: fields.StringField({
+      //   initial: "",
+      //   required: true,
+      // }),
       unlocked: new fields.NumberField({
         initial: GiftAbilityUnlocked.locked,
         integer: true,

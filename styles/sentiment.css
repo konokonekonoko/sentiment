@@ -99,6 +99,11 @@
 .sentiment .sheet-body .description,
 .sentiment .editor,
 .sentiment .editor-content {
+	min-height: 2.5em;
+}
+
+.sentiment .sheet-body .description:has(.editor-container),
+.sentiment .editor:has(.editor-container) {
 	height: 100%;
 }
 
