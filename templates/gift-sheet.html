@@ -12,7 +12,7 @@
         <hr>
         <ol class="list ability-list">
             {{log "gift sheet root" @root}}
-            {{#each abilites as |ability index|}}
+            {{#each effects as |ability index|}}
             <li class="ability list-item flexrow" data-item-id="{{ability._id}}">
                 <p class="ability-name ability-name-column">
                     {{index}} {{ability.name}}<br>
