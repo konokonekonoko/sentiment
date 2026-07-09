@@ -1,5 +1,14 @@
-import { jqueryHTMLhandler } from "../chat.mjs";
+// import { jqueryHTMLhandler } from "../chat.mjs";
 import { ListSortValueIncrement } from "../enums.mjs";
+
+// temporary implementation until damage-automation is merged
+function jqueryHTMLhandler(html) {
+    if (html && html.jquery) {
+        return html[0];
+    } else {
+        return html;
+    }
+}
 
 export default class GiftSheet extends ItemSheet {
 
