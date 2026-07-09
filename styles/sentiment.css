@@ -138,7 +138,63 @@
 
 .sentiment.sheet.gift .sheet-body {
 	overflow-y: auto;
-	/* height: 600px; */
+}
+
+.sentiment.sheet.gift .ability {
+	padding: 2px;
+}
+
+.sentiment.sheet.gift .ability.locked,
+.sentiment.sheet.gift .ability.on-cooldown {
+	opacity: 0.6;
+	/* background-color: #0004; */
+}
+
+.sentiment.sheet.gift .ability-basics {
+	display: flex;
+	align-items: baseline;
+}
+
+.sentiment.sheet.gift .ability-name {
+	font-size: 1.3em;
+	font-weight: bold;
+}
+
+.sentiment.sheet.gift .ability-level {
+	margin-right: 0.5ch;
+}
+
+.sentiment.sheet.gift .ability .ability-cooldown {
+	display: flex;
+	margin-left: 1ch;
+}
+.sentiment.sheet.gift .ability .ability-cooldown .fa-hourglass {
+	align-self: center;
+	font-size: 1em;
+	margin-left: 3px;
+}
+@keyframes rotateHourglass {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(180deg); }
+  50%  { transform: rotate(180deg); }
+  75%  { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
+}
+.sentiment.sheet.gift .ability.on-cooldown .ability-cooldown .fa-hourglass{
+	animation: rotateHourglass 8s ease-in-out infinite;
+}
+
+.sentiment.sheet.gift .ability-resource {
+	margin-left: 1ch;
+}
+
+.sentiment.sheet.gift .ability-description {
+	font-size: 0.9em;
+	line-height: 135%;
+}
+
+.sentiment.sheet.gift .ability-controls {
+	flex: unset;
 }
 
 .sentiment .list .list-item {

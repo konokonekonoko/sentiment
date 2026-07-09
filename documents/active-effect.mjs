@@ -5,7 +5,7 @@ export class GiftAbilityData extends foundry.abstract.DataModel {
   static defineSchema() {
     return {
       unlocked: new fields.NumberField({
-        initial: GiftAbilityUnlocked.locked,
+        initial: GiftAbilityUnlocked.Unlocked,
         integer: true,
         nullable: false,
       }),

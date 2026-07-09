@@ -13,14 +13,56 @@
         <ol class="list ability-list">
             {{log "gift sheet root" @root}}
             {{#each abilities as |ability index|}}
-            <li class="ability list-item flexcolumn" data-item-id="{{ability._id}}">
+            {{log "ability" ability.name ability}}
+            <li class="ability list-item flexcolumn
+                {{~ifThen (gt ability.system.cooldown.remaining 0) ' on-cooldown' ''}}
+                {{~ifThen (gt ability.system.unlocked 0) ' unlocked' ' locked'}}"
+                data-item-id="{{ability._id}}">
                 <div class="flexrow">
-                    <div class="ability-name ability-name-column">
-                        {{ability.enrichedName}}
+                    <div class="ability-basics">
+                        <!-- level -->
+                        {{#if (ne ability.system.level null)}}
+                        <div class="ability-level">
+                            Lv{{ability.system.level}}
+                        </div>
+                        {{/if}}
+
+                        <!-- name -->
+                        <a class="ability-name ability-use">
+                            {{ability.enrichedName}}
+                        </a>
+
+                        <!-- cooldown -->
+                        {{#if ability.system.cooldown.max}}
+                        {{#with ability.system.cooldown}}
+                        <a class="ability-cooldown cooldown-decrement" data-tooltip="{{ifThen (gt remaining 0) 'Decrement ' ''}}Cooldown">
+                            {{~#if (gt remaining 0)~}}
+                                {{remaining}}
+                            {{else}}
+                                {{max}}
+                            {{~/if~}}
+                            <i class="fa-solid fa-hourglass"></i>
+                        </a>
+                        {{/with}}
+                        {{/if}}
+
+                        <!-- Resource -->
+                        {{#if (ne ability.system.resource.remaining null)}}
+                        {{#with ability.system.resource}}
+                        <div class="ability-resource" data-tooltip="{{name}}">
+                            <a class="resource-decrement">-</a>
+                            {{~remaining~}}
+                            {{~#if max~}}
+                            / {{~max~}}
+                            {{~/if~}}
+                            <a class="resource-increment">+</a>
+                        </div>
+                        {{/with}}
+                        {{/if}}
                     </div>
                     <div class="ability-controls ability-controls-column">
-                        <a class="ability-control ability-open" title="Open Ability"> <i class="fas fa-edit"></i> Open</a>
-                        <a class="ability-control ability-delete" title="Delete Ability"> <i class="fas fa-trash"></i> Delete</a>
+                        <a data-action="ability-open" class="ability-control ability-open" title="Open Ability"> <i class="fas fa-edit"></i> Open</a>
+                        <a data-action="ability-delete" class="ability-control ability-delete" title="Delete Ability"> <i class="fas fa-trash"></i> Delete</a>
                     </div>
                 </div>
                 
@@ -32,7 +74,7 @@
             {{/each}}
         </ol>
         <p>
-            <a class="ability-control ability-add" title="Add New ability"><i class="fas fa-plus"></i> Add New ability</a>
+            <a data-action="ability-add" class="ability-control ability-add" title="Add New ability"><i class="fas fa-plus"></i> Add New ability</a>
         </p>
 
     </section>
