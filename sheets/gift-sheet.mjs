@@ -21,7 +21,7 @@ export default class GiftSheet extends ItemSheet {
 
     /** @inheritdoc */
     _onDragStart(event) {
-        // super._onDragStart(event);
+        super._onDragStart(event);
 
         const draggedAbilityHtml = event.target.closest(".ability");
         if (draggedAbilityHtml === null) {
@@ -29,20 +29,26 @@ export default class GiftSheet extends ItemSheet {
         }
 
         const itemId = draggedAbilityHtml.dataset["itemId"];
-        event.dataTransfer.setData("ability", JSON.stringify({ droppedId: itemId }));
-        
-        console.log("_onDragStart", draggedAbilityHtml, event.dataTransfer, event)
-        console.log(event.dataTransfer.types);
-        console.log(event.dataTransfer.getData("ability"));
-    } 
+
+        // Data required to allow foundry to create a `toggleDocumentSheet` macro
+        // when drag-dropping AE onto hotbar.
+        // Consider making it use the ability instead in future?
+        const dragData = {
+            type: "ActiveEffect",
+            uuid: draggedAbilityHtml.dataset["itemUuid"],
+            droppedId: itemId
+        };
+        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+    }
 
     /** @inheritdoc */
     _onDrop(event) {
         const abilityListContainerHtml = event.target.closest(".ability-list");
 
         let droppedAbilityId;
+        let data = {}
         try {
-            const data = JSON.parse(event.dataTransfer.getData("ability"));
+            data = JSON.parse(event.dataTransfer.getData("text/plain"));
             droppedAbilityId = data.droppedId;
         } catch (err) { }
 
@@ -50,7 +56,7 @@ export default class GiftSheet extends ItemSheet {
             return super._onDrop(event);
         }
         if (!this.item.effects.get(droppedAbilityId)) {
-            return super._onDrop(event);
+            return this.#abilityFromDropData(data);
         }
 
         const abilityDroppedUponId = event.target.closest(".ability")?.dataset["itemId"];
@@ -82,13 +88,22 @@ export default class GiftSheet extends ItemSheet {
         const [element] = newOrder.splice(sourceIndex, 1);
         newOrder.splice(targetIndex, 0, element);
     
-        // overwrite sort values for persistence
+        // Overwrite sort values for persistence
         const updates = newOrder.map((ability, i) => ({
             _id: ability.id,
             system: { sort: ListSortValueIncrement * i }
         }));
     
         await this.item.updateEmbeddedDocuments("ActiveEffect", updates);
+    }
+
+    // when dropping an AE onto another item sheet
+    async #abilityFromDropData(data) {
+        const ability = await fromUuid(data.uuid);
+        if (!ability) return;
+
+        const clone = ability.clone({}, {keepId: false});
+        await this.item.createEmbeddedDocuments("ActiveEffect", [clone.toObject()]);
     }
     
     
@@ -156,7 +171,6 @@ export default class GiftSheet extends ItemSheet {
             ? list[list.length - 1].system.sort + ListSortValueIncrement 
             : 0;
         
-        console.log("sortValue",list,sortValue)
         const effectData = {
             name: "New Ability",
             type: "giftAbility",
@@ -268,8 +282,8 @@ export default class GiftSheet extends ItemSheet {
         }
 
         context.abilities = this.#Abilities.sort((a,b) =>
-            (a.system.sort ?? 1000) -
-            (b.system.sort ?? 1000)
+            (a.system.sort ?? 10000) -
+            (b.system.sort ?? 10000)
         );
     }
 
@@ -285,7 +299,7 @@ export default class GiftSheet extends ItemSheet {
         });
     } 
 
-
+    /** @inheritdoc */
     async _render(force = false, options = {}) {
         let element = jqueryHTMLhandler(this.element);
         this.#scrollPos = element?.querySelector(".sheet-body")?.scrollTop ?? 0;

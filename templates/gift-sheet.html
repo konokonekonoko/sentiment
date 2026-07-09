@@ -17,7 +17,8 @@
             <li class="ability list-item flexcolumn
                 {{~ifThen (gt ability.system.cooldown.remaining 0) ' on-cooldown' ''}}
                 {{~ifThen (gt ability.system.unlocked 0) ' unlocked' ' locked'}}"
-                data-item-id="{{ability._id}}">
+                data-item-id="{{ability._id}}"
+                data-item-uuid="{{ability.uuid}}">
                 <div class="flexrow">
                     <div class="ability-basics">
                         <!-- level -->
