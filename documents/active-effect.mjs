@@ -57,6 +57,65 @@ export class SentimentActiveEffect extends ActiveEffect {
           unlockedEnabled: true,
         },
       });
+    }
+  }
+
+  #getParent() {
+    const item = this.parent;
+    if (!item) return;
+    const actor = item.parent;
+    if (!actor) return item;
+    return actor;
+  }
+
+  async abilityToChat() {
+    const context = {
+      system: this.system
+    }
+    context.enrichedName =
+      await TextEditor.enrichHTML(this.name, {
+        secrets: this.isOwner,
+        async: true
+      });
+    context.enrichedDescription =
+      await TextEditor.enrichHTML(this.system.description, {
+        secrets: this.isOwner,
+        async: true
+      });
+
+    const templatePath = "systems/sentiment/templates/abilities/ability-chat.html"
+    return this.#renderToChatMessage(templatePath, context);
+  }
+
+  /**
+   * Render an HTML template with arguments as a chat message with this character as the speaker.
+   * @param templatePath
+   * @param args
+   * @param messageOptions
+   * @private
+   */
+  async #renderToChatMessage(templatePath, args, messageOptions = {}) {
+    const html = await renderTemplate(templatePath, {
+      ...args,
+      speaker: this,
+    });
+    let message = {
+      user: game.user.id,
+      speaker: ChatMessage.getSpeaker({ actor: this.#getParent() }),
+      content: html,
     };
+
+    message = foundry.utils.mergeObject(message, messageOptions);
+    // ChatMessage.applyRollMode(message, game.settings.get("core", "rollMode"));
+
+    const createdMessage = await ChatMessage.create(message);
+    createdMessage.setFlag("sentiment", args.title ?? "Unknown", {
+      ...args,
+      origin: {
+        uuid: this.uuid,
+        name: this.name,
+      },
+    });
+    return createdMessage;
   }
 }

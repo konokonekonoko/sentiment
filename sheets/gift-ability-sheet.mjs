@@ -39,5 +39,5 @@ export default class GiftAbilitySheet extends ActiveEffectConfig {
 
     console.log("gift ability sheet context", context)
     return context;
-}
+  }
 }

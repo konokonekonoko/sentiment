@@ -75,7 +75,7 @@ export default class GiftSheet extends ItemSheet {
         html.find(".ability-delete").click(this.#onAbilityDelete.bind(this));
         html.find(".ability-use").click(this.#onAbilityUse.bind(this));
 
-        html.find(".cooldown-decrement").click(this.#onCooldownDecrement.bind(this));
+        html.find(".cooldown-decrement").click(this.#onCooldownAction.bind(this));
 
         html.find(".resource-increment").click(this.#onResourceInccrement.bind(this));
         html.find(".resource-decrement").click(this.#onResourceDecrement.bind(this));
@@ -138,11 +138,11 @@ export default class GiftSheet extends ItemSheet {
         ability.sheet.render(true);
     }
 
-    #onAbilityUse(event) {
+    async #onAbilityUse(event) {
         event.preventDefault();
         const ability = this.#getItemFromListEvent(event);
-        // TODO ability to chat
 
+        await ability.abilityToChat()
         const cooldown = ability.system.cooldown;
         if ( !(cooldown.max && cooldown.max > 0) ) return;
         ability.update({
@@ -150,14 +150,20 @@ export default class GiftSheet extends ItemSheet {
         })
     }
 
-    #onCooldownDecrement(event) {
+    #onCooldownAction(event) {
         event.preventDefault();
         const ability = this.#getItemFromListEvent(event);
         const cooldown = ability.system.cooldown;
-        if ( !(cooldown.remaining && cooldown.remaining > 0) ) return;
-        ability.update({
-            "system.cooldown.remaining": Math.max(0, cooldown.remaining - 1)
-        })
+
+        const updates = {};
+        if (cooldown.remaining > 0) {
+            updates["system.cooldown.remaining"] = Math.max(0, cooldown.remaining - 1);
+        }
+        else if (cooldown.max > 0) {
+            updates["system.cooldown.remaining"] = cooldown.max;
+        }
+        ability.update(updates)
+        
     }
 
     #onResourceInccrement(event) {
