@@ -2,13 +2,12 @@ import {
     AttributeStatus,
     GiftEquipStatus,
     RollTypes,
-    AttributeStatusStrings
+    AttributeStatusStrings,
+    ListSortValueIncrement
 } from "../enums.mjs";
 
 import { AttributeIdNoSwing } from "../documents/character.mjs"
 import { GiftEquipStatusInitial } from "../documents/gift.mjs"
-
-const ListSortValueIncrement = 100000;
 
 export default class CharacterSheet extends ActorSheet {
 
@@ -433,6 +432,8 @@ export default class CharacterSheet extends ActorSheet {
 
         const itemId = draggedGiftHtml.dataset["itemId"];
         event.dataTransfer.setData("gift", JSON.stringify({ giftId: itemId }));
+
+        console.log("_onDragStart",{event, draggedGiftHtml,itemId, dataTransfer: event.dataTransfer})
     }
 
     /** @inheritdoc */
@@ -445,12 +446,15 @@ export default class CharacterSheet extends ActorSheet {
             droppedGiftId = data.giftId;
         } catch (err) { }
 
+        console.log("_onDrop",{giftListContainerHtml,droppedGiftId})
+
         if (!giftListContainerHtml || !droppedGiftId) {
             return super._onDrop(event);
         }
 
         const giftDroppedUponId = event.target.closest(".gift")?.dataset["itemId"];
         this.#handleGiftDroppedOnList(droppedGiftId, giftDroppedUponId, giftListContainerHtml);
+        console.log("_onDrop",{giftDroppedUponId,droppedGiftId})
     }
 
     /**

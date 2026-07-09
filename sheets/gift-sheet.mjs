@@ -1,4 +1,5 @@
 import { jqueryHTMLhandler } from "../chat.mjs";
+import { ListSortValueIncrement } from "../enums.mjs";
 
 export default class GiftSheet extends ItemSheet {
 
@@ -8,7 +9,7 @@ export default class GiftSheet extends ItemSheet {
             classes: ["sentiment", "sheet", "gift"],
             template: "systems/sentiment/templates/gift-sheet.html",
             dragDrop: [
-                { dragSelector: ".ability-list .ability", dropSelector: null }
+                { dragSelector: ".ability-list .ability", dropSelector: null },
             ],
             width: 600,
             height: 600
@@ -16,10 +17,11 @@ export default class GiftSheet extends ItemSheet {
     }
 
     #Abilities = []
+    #scrollPos
 
     /** @inheritdoc */
     _onDragStart(event) {
-        super._onDragStart(event);
+        // super._onDragStart(event);
 
         const draggedAbilityHtml = event.target.closest(".ability");
         if (draggedAbilityHtml === null) {
@@ -27,32 +29,74 @@ export default class GiftSheet extends ItemSheet {
         }
 
         const itemId = draggedAbilityHtml.dataset["itemId"];
-        event.dataTransfer.setData("ability", JSON.stringify({ abilityId: itemId }));
+        event.dataTransfer.setData("ability", JSON.stringify({ droppedId: itemId }));
+        
+        console.log("_onDragStart", draggedAbilityHtml, event.dataTransfer, event)
+        console.log(event.dataTransfer.types);
+        console.log(event.dataTransfer.getData("ability"));
+    } 
+
+    /** @inheritdoc */
+    _onDrop(event) {
+        const abilityListContainerHtml = event.target.closest(".ability-list");
+
+        let droppedAbilityId;
+        try {
+            const data = JSON.parse(event.dataTransfer.getData("ability"));
+            droppedAbilityId = data.droppedId;
+        } catch (err) { }
+
+        if (!droppedAbilityId) {
+            return super._onDrop(event);
+        }
+        if (!this.item.effects.get(droppedAbilityId)) {
+            return super._onDrop(event);
+        }
+
+        const abilityDroppedUponId = event.target.closest(".ability")?.dataset["itemId"];
+        this.#handleAbilityDroppedOnList(droppedAbilityId, abilityDroppedUponId, abilityListContainerHtml);
     }
 
-    // /** @inheritdoc */
-    // _onDrop(event) {
-    //     // const abilityListContainerHtml = event.target.closest(".gift-list-container");
-
-    //     let droppedAbilityId;
-    //     try {
-    //         const data = JSON.parse(event.dataTransfer.getData("gift"));
-    //         droppedAbilityId = data.giftId;
-    //     } catch (err) { }
-
-    //     if (!droppedAbilityId) {
-    //         return super._onDrop(event);
-    //     }
-
-    //     const giftDroppedUponId = event.target.closest(".gift")?.dataset["itemId"];
-    //     this.#handleGiftDroppedOnList(droppedAbilityId, giftDroppedUponId, giftListContainerHtml);
-    // }
+    async #handleAbilityDroppedOnList(droppedAbilityId, abilityDroppedUponId) {
+        if (droppedAbilityId === abilityDroppedUponId) {
+            return;
+        }
+    
+        const droppedAbility = this.item.effects.get(droppedAbilityId);
+        if (!droppedAbility) {
+            throw new Error("Dropped ability ID not found among the item's effects.");
+        }
+    
+        const abilityDroppedUpon = this.object.effects.get(abilityDroppedUponId);
+        if (!abilityDroppedUpon) {
+            throw new Error("Dropped on ability ID not found among the item's effects.");
+        }
+    
+        const newOrder = [...this.#Abilities];
+        if (newOrder.length === 0) return;
+    
+        const sourceIndex = newOrder.indexOf(droppedAbility);
+        const targetIndex = newOrder.indexOf(abilityDroppedUpon);
+        if (sourceIndex < 0 || targetIndex < 0) return;
+    
+        const [element] = newOrder.splice(sourceIndex, 1);
+        newOrder.splice(targetIndex, 0, element);
+    
+        // overwrite sort values for persistence
+        const updates = newOrder.map((ability, i) => ({
+            _id: ability.id,
+            system: { sort: ListSortValueIncrement * i }
+        }));
+    
+        await this.item.updateEmbeddedDocuments("ActiveEffect", updates);
+    }
+    
     
     /** @inheritdoc */
     async getData(options) {
         const context = await super.getData(options);
 
-        context.effects = this.object.effects;
+        context.effects = this.item.effects
 
         await this.#populateDescription(context);
         await this.#populateAbilities(context);
@@ -106,9 +150,19 @@ export default class GiftSheet extends ItemSheet {
      */
     async #onAbilityAdd(event) {
         event.preventDefault();
+
+        const list = this.#Abilities;
+        const sortValue = list.length > 0
+            ? list[list.length - 1].system.sort + ListSortValueIncrement 
+            : 0;
+        
+        console.log("sortValue",list,sortValue)
         const effectData = {
             name: "New Ability",
-            type: "giftAbility"
+            type: "giftAbility",
+            system: {
+                sort: sortValue
+            }
         };
 
         return await ActiveEffect.create(effectData, { parent: this.item });
@@ -213,7 +267,10 @@ export default class GiftSheet extends ItemSheet {
             }
         }
 
-        context.abilities = this.#Abilities;
+        context.abilities = this.#Abilities.sort((a,b) =>
+            (a.system.sort ?? 1000) -
+            (b.system.sort ?? 1000)
+        );
     }
 
     /**
@@ -227,4 +284,15 @@ export default class GiftSheet extends ItemSheet {
             async: true
         });
     } 
+
+
+    async _render(force = false, options = {}) {
+        let element = jqueryHTMLhandler(this.element);
+        this.#scrollPos = element?.querySelector(".sheet-body")?.scrollTop ?? 0;
+        await super._render(force, options);
+        element = jqueryHTMLhandler(this.element);
+        if (element && this.#scrollPos > 0) {
+            element.querySelector(".sheet-body").scrollTop = this.#scrollPos;
+        }
+    }
 }

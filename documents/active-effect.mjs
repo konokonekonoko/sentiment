@@ -1,9 +1,15 @@
-import { GiftAbilityUnlocked } from "../enums.mjs";
+import { GiftAbilityUnlocked, ListSortValueIncrement } from "../enums.mjs";
+
 const fields = foundry.data.fields;
 
 export class GiftAbilityData extends foundry.abstract.DataModel {
   static defineSchema() {
     return {
+      sort: new fields.NumberField({
+        initial: ListSortValueIncrement,
+        integer: true,
+        nullable: false,
+      }),
       unlocked: new fields.NumberField({
         initial: GiftAbilityUnlocked.Unlocked,
         integer: true,

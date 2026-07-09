@@ -49,3 +49,5 @@ export function reverseKeyValue(obj) {
             return acc;
         }, {});
 }
+
+export const ListSortValueIncrement = 100000;
