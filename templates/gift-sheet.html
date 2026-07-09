@@ -12,23 +12,22 @@
         <hr>
         <ol class="list ability-list">
             {{log "gift sheet root" @root}}
-            {{#each effects as |ability index|}}
-            <li class="ability list-item flexrow" data-item-id="{{ability._id}}">
-                <p class="ability-name ability-name-column">
-                    {{index}} {{ability.name}}<br>
-                    {{ability.description}}
-                </p>
-                <!-- <p class="ability-modifier-text ability-modifier-column">+{{ability.system.modifier}}</p>
-                <p class="ability-status ability-status-column">{{ability.statusString}}</p>
-                <div class="ability-status-controls ability-status-controls-column">
-                    {{#if ability.showRestoreButton}}<button class="button ability-restore" type="button" title="Restore">Restore</button>{{/if}}
-                    {{#if ability.showLockOutButton}}<button class="button ability-lock-out" type="button" title="Lock Out">Lock Out</button>{{/if}}
-                    {{#if ability.showWoundButton}}<button class="button ability-wound" type="button" title="Wound">Wound</button>{{/if}}
-                </div> -->
-                <div class="ability-controls ability-controls-column">
-                    <a class="ability-control ability-open" title="Open Ability"> <i class="fas fa-edit"></i> Open</a>
-                    <a class="ability-control ability-delete" title="Delete Ability"> <i class="fas fa-trash"></i> Delete</a>
+            {{#each abilities as |ability index|}}
+            <li class="ability list-item flexcolumn" data-item-id="{{ability._id}}">
+                <div class="flexrow">
+                    <div class="ability-name ability-name-column">
+                        {{ability.enrichedName}}
+                    </div>
+                    <div class="ability-controls ability-controls-column">
+                        <a class="ability-control ability-open" title="Open Ability"> <i class="fas fa-edit"></i> Open</a>
+                        <a class="ability-control ability-delete" title="Delete Ability"> <i class="fas fa-trash"></i> Delete</a>
+                    </div>
                 </div>
+                
+                <div class="ability-description ability-description-column">
+                    {{{ability.enrichedDescription}}}
+                </div>
+                
             </li>
             {{/each}}
         </ol>

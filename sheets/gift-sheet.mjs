@@ -12,6 +12,39 @@ export default class GiftSheet extends ItemSheet {
             height: 600
         });
     }
+
+    #Abilities = []
+
+    /** @inheritdoc */
+    _onDragStart(event) {
+        super._onDragStart(event);
+
+        const draggedAbilityHtml = event.target.closest(".ability");
+        if (draggedAbilityHtml === null) {
+            return;
+        }
+
+        const itemId = draggedAbilityHtml.dataset["itemId"];
+        event.dataTransfer.setData("ability", JSON.stringify({ abilityId: itemId }));
+    }
+
+    // /** @inheritdoc */
+    // _onDrop(event) {
+    //     // const abilityListContainerHtml = event.target.closest(".gift-list-container");
+
+    //     let droppedAbilityId;
+    //     try {
+    //         const data = JSON.parse(event.dataTransfer.getData("gift"));
+    //         droppedAbilityId = data.giftId;
+    //     } catch (err) { }
+
+    //     if (!droppedAbilityId) {
+    //         return super._onDrop(event);
+    //     }
+
+    //     const giftDroppedUponId = event.target.closest(".gift")?.dataset["itemId"];
+    //     this.#handleGiftDroppedOnList(droppedAbilityId, giftDroppedUponId, giftListContainerHtml);
+    // }
     
     /** @inheritdoc */
     async getData(options) {
@@ -20,7 +53,7 @@ export default class GiftSheet extends ItemSheet {
         context.effects = this.object.effects;
 
         await this.#populateDescription(context);
-        this.#populateAbilities(context);
+        await this.#populateAbilities(context);
 
         console.log("gift getData", context)
         return context;
@@ -31,7 +64,7 @@ export default class GiftSheet extends ItemSheet {
         super.activateListeners(html);
         
         // html.find(".attribute-open").click(this.#onAttributeOpen.bind(this));
-        // html.find(".gift-open").click(this.#onGiftOpen.bind(this));
+        html.find(".ability-open").click(this.#onAbilityOpen.bind(this));
 
         if (!this.isEditable) {
             return;
@@ -54,7 +87,7 @@ export default class GiftSheet extends ItemSheet {
      */
     #getItemFromListEvent(event) {
         const listItem = $(event.currentTarget).parents(".list-item");
-        const item = this.actor.items.get(listItem.data("itemId"));
+        const item = this.item.effects.get(listItem.data("itemId"));
         return item;
     }
 
@@ -85,13 +118,38 @@ export default class GiftSheet extends ItemSheet {
         attribute.deleteDialog();
     }
 
-    #populateAbilities(context) {
-        context.abilities = [];
-        for (let item of context.effects) {
-            if (item.type == "attribute") {
-                context.attributes.push(item);
+    /**
+     * Handle event when the user opens a gift ability.
+     * @param event
+     * @private
+     */
+    #onAbilityOpen(event) {
+        event.preventDefault();
+
+        const ability = this.#getItemFromListEvent(event);
+        ability.sheet.render(true);
+    }
+
+    async #populateAbilities(context) {
+        this.#Abilities = []
+        for (let effect of context.effects) {
+            if (effect.type == "giftAbility") {
+                console.log("effect.system",effect.name,effect.system)
+                effect.enrichedName =
+                    await TextEditor.enrichHTML(effect.name, {
+                    secrets: this.document.isOwner,
+                    async: true
+                });
+                effect.enrichedDescription =
+                    await TextEditor.enrichHTML(effect.system.description, {
+                    secrets: this.document.isOwner,
+                    async: true
+                });
+                this.#Abilities.push(effect);
             }
         }
+
+        context.abilities = this.#Abilities;
     }
 
     /**

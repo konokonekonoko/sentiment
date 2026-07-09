@@ -1,0 +1,231 @@
+{{!-- Modified from the base foundry ae sheet --}}
+<form autocomplete="off">
+    <!-- Effect Header -->
+    <header class="sheet-header">
+        <img class="effect-img" src="{{ data.img }}" data-edit="img">
+        <h1 class="effect-title">
+            <input name="name" type="text" value="{{data.name}}" placeholder="{{ localize 'Name' }}"/>
+        </h1>
+    </header>
+
+    <!-- Effect Configuration Tabs -->
+    <nav class="sheet-tabs tabs" aria-role="{{localize 'SHEETS.FormNavLabel'}}">
+        <a class="item" data-tab="details"><i class="fas fa-book"></i> {{localize "EFFECT.TabDetails"}}</a>
+        <a class="item" data-tab="duration"><i class="fas fa-clock"></i> {{localize "EFFECT.TabDuration"}}</a>
+        <a class="item" data-tab="effects"><i class="fas fa-cogs"></i> {{localize "EFFECT.TabEffects"}}</a>
+    </nav>
+
+    <!-- Details Tab -->
+    <section class="tab" data-tab="details">
+        <div class="form-group editor-container stacked">
+            {{!-- <label>{{ localize "EFFECT.Description" }}</label> --}}
+            {{editor descriptionHTML target="system.description" button=false editable=editable engine="prosemirror" collaborate=false}}
+        </div>
+        <hr>
+
+        <div class="form-group stacked">
+
+            <ol class="ability-options">
+                <header class="effect-change effects-header flexrow">
+                    <div class="option-toggle">Show</div>
+                    <div class="option-name">Option</div>
+                    <div class="option-fields">Values</div>
+                </header>
+
+                {{!-- Level --}}
+                <li class="ability-option flexrow">
+                    <div class="option-toggle">
+                        <input type="checkbox" name="flags.sentiment.levelEnabled"
+                            {{checked flags.levelEnabled}}>
+                    </div>
+                    <div class="option-name">
+                        <label>Level</label>
+                    </div>
+                    <div class="option-fields">
+                        <input name="system.level" type="number" value="{{ system.level }}"/>
+                    </div>
+                </li>
+
+                {{!-- Unlocked --}}
+                <li class="ability-option flexrow">
+                    <div class="option-toggle">
+                        <input type="checkbox" name="flags.sentiment.unlockedEnabled"
+                            {{checked flags.unlockedEnabled}}>
+                    </div>
+                    <div class="option-name">
+                        <label>Unlocked</label>
+                    </div>
+                    <div class="option-fields">
+                        <select class="ability-unlocked" name="system.unlocked">
+                            {{selectOptions selectOptions.unlocked selected=system.unlocked}} 
+                        </select>
+                    </div>
+                </li>
+
+                {{!-- Resource --}}
+                <li class="ability-option flexrow">
+                    <div class="option-toggle">
+                        <input type="checkbox" name="flags.sentiment.resourceEnabled"
+                            {{checked flags.resourceEnabled}}>
+                    </div>
+                    <div class="option-name">
+                        <label>Resource</label>
+                    </div>
+                    <div class="option-fields">
+                        <div class="form-fields">
+                            <input type="text"
+                                name="system.resource.name"
+                                value="{{ system.resource.name }}"
+                                placeholder="Resource Name"/>
+                            <input type="number"
+                                name="system.resource.remaining"
+                                value="{{ system.resource.remaining }}"
+                                placeholder="Remaining"/>
+                            <label>/</label>
+                            <input type="number"
+                                name="system.resource.max"
+                                value="{{ system.resource.max }}"
+                                placeholder="Maximum"/>
+                        </div>
+                    </div>
+                </li>
+
+                {{!-- Cooldown --}}
+                <li class="ability-option flexrow">
+                    <div class="option-toggle">
+                        <input type="checkbox" name="flags.sentiment.cooldownEnabled"
+                            {{checked flags.cooldownEnabled}}>
+                    </div>
+                    <div class="option-name">
+                        <label>Cooldown</label>
+                    </div>
+                    <div class="option-fields">
+                        <div class="form-fields">
+                            <input type="number"
+                                name="system.cooldown.remaining"
+                                value="{{ system.cooldown.remaining }}"/>
+                            <label>/</label>
+                            <input type="number"
+                                name="system.cooldown.max"
+                                value="{{ system.cooldown.max }}"/>
+                        </div>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+    </section>
+
+    <!-- Duration Tab -->
+    <section class="tab" data-tab="duration">
+        <div class="form-group">
+            <label>{{ localize "EFFECT.DurationSecs" }}</label>
+            <div class="form-fields">
+                <input type="number" name="duration.seconds" value="{{ data.duration.seconds }}"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>{{ localize "EFFECT.StartTime" }}</label>
+            <div class="form-fields">
+                <input type="number" name="duration.startTime" value="{{ data.duration.startTime }}"/>
+            </div>
+        </div>
+        <hr/>
+        <div class="form-group">
+            <label>{{ localize "EFFECT.DurationTurns" }}</label>
+            <div class="form-fields">
+                <label>{{ localize "COMBAT.Rounds" }}</label>
+                <input type="number" name="duration.rounds" value="{{ data.duration.rounds }}"/>
+                <label>{{ localize "COMBAT.Turns" }}</label>
+                <input type="number" name="duration.turns" value="{{ data.duration.turns }}"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>{{ localize "EFFECT.Combat" }}</label>
+            <div class="form-fields">
+                <input type="text" name="duration.combat" value="{{ data.duration.combat }}" disabled/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>{{ localize "EFFECT.StartTurns" }}</label>
+            <div class="form-fields">
+                <label>{{ localize "COMBAT.Round" }}</label>
+                <input type="number" name="duration.startRound" value="{{ data.duration.startRound }}"/>
+                <label>{{ localize "COMBAT.Turn" }}</label>
+                <input type="number" name="duration.startTurn" value="{{ data.duration.startTurn }}"/>
+            </div>
+        </div>
+    </section>
+
+    <!-- Effects Tab -->
+    <section class="tab" data-tab="effects">
+        <header class="effect-change effects-header flexrow">
+            <div class="key">{{ localize "EFFECT.ChangeKey" }}</div>
+            <div class="mode">{{ localize "EFFECT.ChangeMode" }}</div>
+            <div class="value">{{ localize "EFFECT.ChangeValue" }}</div>
+            <div class="effect-controls">
+                <a class="effect-control" data-action="add"><i class="far fa-plus-square"></i></a>
+            </div>
+        </header>
+        <ol class="changes-list">
+            {{#each data.changes as |change i|}}
+            <li class="effect-change flexrow" data-index="{{i}}">
+                <div class="key">
+                    <input type="text" name="changes.{{i}}.key" value="{{change.key}}"/>
+                </div>
+                <div class="mode">
+                    <select name="changes.{{i}}.mode" data-dtype="Number">
+                        {{selectOptions ../modes selected=change.mode}}
+                    </select>
+                </div>
+                <div class="value">
+                    <input type="text" name="changes.{{i}}.value" value="{{change.value}}"/>
+                </div>
+                <div class="effect-controls">
+                    <a class="effect-control" data-action="delete"><i class="fas fa-trash"></i></a>
+                </div>
+            </li>
+            {{/each}}
+        </ol>
+        <hr>
+        <div class="form-group">
+            <label>{{ localize "EFFECT.Disabled" }}</label>
+            <input type="checkbox" name="disabled" {{ checked data.disabled }}/>
+        </div>
+
+        {{#if isActorEffect}}
+        <div class="form-group">
+            <label>{{ localize "EFFECT.Origin" }}</label>
+            <div class="form-fields">
+                <input type="text" name="origin" value="{{ data.origin }}" disabled/>
+            </div>
+        </div>
+        {{/if}}
+
+        {{#if isItemEffect}}
+        <div class="form-group">
+            <label>{{ labels.transfer.name }}</label>
+            <div class="form-fields">
+                <input type="checkbox" name="transfer" {{checked data.transfer}}/>
+            </div>
+            <p class="hint">{{ labels.transfer.hint }}</p>
+        </div>
+        {{/if}}
+
+        <div class="form-group">
+            <label>Status Conditions</label>
+            <div class="form-fields">
+                <multi-select name="statuses">
+                    {{#each statuses as |status|}}
+                    <option value="{{status.id}}" {{status.selected}}>{{status.label}}</option>
+                    {{/each}}
+                </multi-select>
+            </div>
+        </div>
+    </section>
+
+    <footer class="sheet-footer">
+        <button type="submit"><i class="fas fa-save"></i> {{localize submitText}}</button>
+    </footer>
+</form>

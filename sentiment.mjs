@@ -7,7 +7,7 @@ import AttributeSheet from "./sheets/attribute-sheet.mjs";
 import { GiftData } from "./documents/gift.mjs";
 import GiftSheet from "./sheets/gift-sheet.mjs";
 
-import { GiftAbilityData } from "./documents/active-effect.mjs";
+import { GiftAbilityData, SentimentActiveEffect } from "./documents/active-effect.mjs";
 import GiftAbilitySheet from "./sheets/gift-ability-sheet.mjs"
 
 import {
@@ -34,10 +34,13 @@ Hooks.once("init", async function () {
 
     CONFIG.Item.dataModels.attribute = AttributeData;
     CONFIG.Item.dataModels.gift = GiftData;
-    CONFIG.ActiveEffect.dataModels.giftAbility = GiftAbilityData;
     CONFIG.Item.dataModels.customRoll = CustomRollData;
     CONFIG.Actor.dataModels.character = CharacterData;
     CONFIG.Actor.documentClass = Character;
+
+    CONFIG.ActiveEffect.dataModels.giftAbility = GiftAbilityData;
+    CONFIG.ActiveEffect.documentClass = SentimentActiveEffect;
+
     CONFIG.Sentiment = {
         RollTypes,
         AttributeStatus,

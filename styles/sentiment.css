@@ -136,6 +136,11 @@
 	overflow-y: auto;
 }
 
+.sentiment.sheet.gift .sheet-body {
+	overflow-y: auto;
+	/* height: 600px; */
+}
+
 .sentiment .list .list-item {
 	min-height: 30px;
 	line-height: 24px;
@@ -154,6 +159,29 @@
 .sentiment .attribute-name-column,
 .sentiment .attribute-controls-column {
 	flex-grow: 2;
+}
+
+.sentiment .ability-options {
+	margin: 0;
+	padding: 0;
+}
+
+.sentiment .ability-options .option-toggle {
+	flex: 1.5;
+}
+.sentiment .ability-options .option-name {
+	flex: 4;
+}
+.sentiment .ability-options .option-fields {
+	flex: 14;
+}
+
+.sentiment .ability-options input[name="system.resource.name"] {
+	width: 15em;
+}
+
+.sentiment.giftAbility .editor-container {
+	height: 255px;
 }
 
 .sentiment .attribute-color-column,

@@ -1,4 +1,4 @@
-import { GiftAbilityUnlocked } from "../enums.mjs"
+import { GiftAbilityUnlocked } from "../enums.mjs";
 const fields = foundry.data.fields;
 
 export class GiftAbilityData extends foundry.abstract.DataModel {
@@ -19,7 +19,7 @@ export class GiftAbilityData extends foundry.abstract.DataModel {
           initial: null,
           nullable: true,
         }),
-        min: new fields.NumberField({
+        remaining: new fields.NumberField({
           initial: null,
           integer: false,
           nullable: true,
@@ -28,8 +28,35 @@ export class GiftAbilityData extends foundry.abstract.DataModel {
           initial: null,
           integer: false,
           nullable: true,
-        })
+        }),
       }),
+      cooldown: new fields.SchemaField({
+        remaining: new fields.NumberField({
+          initial: null,
+          integer: true,
+          nullable: true,
+        }),
+        max: new fields.NumberField({
+          initial: null,
+          integer: true,
+          nullable: true,
+        }),
+      }),
+    };
+  }
+}
+
+export class SentimentActiveEffect extends ActiveEffect {
+  async _preCreate(data, options, user) {
+    await super._preCreate(data, options, user);
+
+    if (this.type === "giftAbility") {
+      this.updateSource({
+        "flags.sentiment": {
+          levelEnabled: true,
+          unlockedEnabled: true,
+        },
+      });
     };
   }
 }
