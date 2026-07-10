@@ -16,6 +16,7 @@ export default class GiftAbilitySheet extends ActiveEffectConfig {
         });
     }
 
+    /** @inheritdoc */
     async getData(options) {
         const context = await super.getData(options);
 

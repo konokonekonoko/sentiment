@@ -43,8 +43,8 @@ export default class GiftSheet extends ItemSheet {
         const dragData = {
             droppedId: itemId,
             // Data required to allow foundry to create a `toggleDocumentSheet` macro
-        // when drag-dropping AE onto hotbar.
-        // Consider making it use the ability instead in future?
+            // when drag-dropping AE onto hotbar.
+            // Consider making it use the ability instead in future?
             type: "ActiveEffect",
             uuid: draggedAbilityHtml.dataset["itemUuid"]
             
@@ -74,6 +74,13 @@ export default class GiftSheet extends ItemSheet {
         this.#handleAbilityDroppedOnList(droppedAbilityId, abilityDroppedUponId, abilityListContainerHtml);
     }
 
+    /**
+    * React to an ability being dropped on a gift sheet, rearranging the the destination list or cloning the gift if it was not already
+    * present in the destination.
+    * @param droppedAbilityId
+    * @param abilityDroppedUponId
+    * @private
+    */
     async #handleAbilityDroppedOnList(droppedAbilityId, abilityDroppedUponId) {
         if (droppedAbilityId === abilityDroppedUponId) {
             return;
@@ -108,7 +115,11 @@ export default class GiftSheet extends ItemSheet {
         await this.item.updateEmbeddedDocuments("ActiveEffect", updates);
     }
 
-    // when dropping an AE onto another item sheet
+    /**
+    * Handle cloning of an ability from drop data on a new sheet.
+    * @param data
+    * @private
+    */
     async #abilityFromDropData(data) {
         const ability = await fromUuid(data.uuid);
         if (!ability) return;
@@ -148,12 +159,6 @@ export default class GiftSheet extends ItemSheet {
 
         html.find(".resource-increment").click(this.#onResourceInccrement.bind(this));
         html.find(".resource-decrement").click(this.#onResourceDecrement.bind(this));
-        
-        // this.#setDragDataOnButton(html, ".drop-swing", "dropSwing");
-        // this.#setDragDataOnButton(html, ".roll-to-do", "rollToDo");
-        // this.#setDragDataOnButton(html, ".roll-to-dye", "rollToDye");
-        // this.#setDragDataOnButton(html, ".recovery-roll", "recoveryRoll");
-        // this.#setDragDataOnCustomRolls(html);
     }
 
 
@@ -169,7 +174,7 @@ export default class GiftSheet extends ItemSheet {
     }
 
     /**
-     * Handle event when the user adds an ability.
+     * Handle event when the user adds a gift ability.
      * @param event
      * @private
      */
@@ -193,7 +198,7 @@ export default class GiftSheet extends ItemSheet {
     }
 
     /**
-     * Handle event when the user deletes an attribute.
+     * Handle event when the user deletes a gift ability.
      * @param event
      * @private
      */
@@ -228,6 +233,12 @@ export default class GiftSheet extends ItemSheet {
         })
     }
 
+    /**
+     * Handle event when the user clicks on a gift ability's cooldown button and decrement the cooldown if it is 
+     * already active. Otherwise, start the cooldown.
+     * @param event
+     * @private
+     */
     #onCooldownAction(event) {
         event.preventDefault();
         const ability = this.#getItemFromListEvent(event);
@@ -244,6 +255,11 @@ export default class GiftSheet extends ItemSheet {
         
     }
 
+    /**
+     * Handle event when the user clicks on a resource's increment to increment the resource's count with proper clamping.
+     * @param event
+     * @private
+     */
     #onResourceInccrement(event) {
         event.preventDefault();
         const ability = this.#getItemFromListEvent(event);
@@ -261,6 +277,12 @@ export default class GiftSheet extends ItemSheet {
             "system.resource.remaining": newValue
         })
     }
+
+    /**
+     * Handle event when the user clicks on a resource's decrement to decrement the resource's count with proper clamping.
+     * @param event
+     * @private
+     */
     #onResourceDecrement(event) {
         event.preventDefault();
         const ability = this.#getItemFromListEvent(event);
@@ -272,6 +294,12 @@ export default class GiftSheet extends ItemSheet {
         })
     }
 
+    /**
+    * Iterate all owned active effects and embed a collection containing only the abilities into the context for easy access.
+    * Additionally embeds enriched versions of the ability's text fields within the ability.
+    * @param context
+    * @private
+    */
     async #populateAbilities(context) {
         this.#Abilities = []
         for (let effect of context.effects) {

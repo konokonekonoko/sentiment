@@ -53,6 +53,10 @@ export class GiftAbilityData extends foundry.abstract.DataModel {
 }
 
 export class SentimentActiveEffect extends ActiveEffect {
+    /**
+    * Returns the top-most parent of the active effect.
+    * @private
+    */
     #getParent() {
         const item = this.parent;
         if (!item) return;
@@ -61,6 +65,9 @@ export class SentimentActiveEffect extends ActiveEffect {
         return actor;
     }
 
+    /**
+     * Render an ability as a chat message.
+     */
     async abilityToChat() {
         const context = {
             title: "GiftAbility",
@@ -84,12 +91,12 @@ export class SentimentActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Render an HTML template with arguments as a chat message with this character as the speaker.
-     * @param templatePath
-     * @param args
-     * @param messageOptions
-     * @private
-     */
+    * Render an HTML template with arguments as a chat message with this character as the speaker.
+    * @param templatePath
+    * @param args
+    * @param messageOptions
+    * @private
+    */
     async #renderToChatMessage(templatePath, args, messageOptions = {}) {
         const html = await renderTemplate(templatePath, {
             ...args,
