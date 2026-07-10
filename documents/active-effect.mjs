@@ -53,18 +53,6 @@ export class GiftAbilityData extends foundry.abstract.DataModel {
 }
 
 export class SentimentActiveEffect extends ActiveEffect {
-  async _preCreate(data, options, user) {
-    await super._preCreate(data, options, user);
-
-    if (this.type === "giftAbility") {
-      this.updateSource({
-        "flags.sentiment": {
-          levelEnabled: true,
-          unlockedEnabled: true,
-        },
-      });
-    }
-  }
 
   #getParent() {
     const item = this.parent;
@@ -76,6 +64,7 @@ export class SentimentActiveEffect extends ActiveEffect {
 
   async abilityToChat() {
     const context = {
+      title: "GiftAbility",
       system: this.system
     }
     context.enrichedName =
@@ -112,7 +101,6 @@ export class SentimentActiveEffect extends ActiveEffect {
     };
 
     message = foundry.utils.mergeObject(message, messageOptions);
-    // ChatMessage.applyRollMode(message, game.settings.get("core", "rollMode"));
 
     const createdMessage = await ChatMessage.create(message);
     createdMessage.setFlag("sentiment", args.title ?? "Unknown", {

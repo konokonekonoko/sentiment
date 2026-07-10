@@ -217,24 +217,41 @@
 	flex-grow: 2;
 }
 
+.sentiment .ability-header {
+	display: flex;
+	flex-direction: column;
+	flex: unset !important;
+	gap: 5px;
+}
+
+.sentiment .ability-level {
+	justify-items: center;
+	display: flex;
+	gap: 5px;
+	align-items: baseline;
+}
+.sentiment .ability-level .header-fields {
+	width: 3em;
+  text-align: center;
+}
+
 .sentiment .ability-options {
 	margin: 0;
 	padding: 0;
+	display: flex;
+	gap: 20px;
 }
 
-.sentiment .ability-options .option-toggle {
-	flex: 1.5;
-}
 .sentiment .ability-options .option-name {
 	flex: 4;
 }
 .sentiment .ability-options .option-fields {
-	flex: 14;
+	flex: 6;
 }
 
-.sentiment .ability-options input[name="system.resource.name"] {
+/* .sentiment .ability-options input[name="system.resource.name"] {
 	width: 15em;
-}
+} */
 
 .sentiment.giftAbility .editor-container {
 	height: 255px;

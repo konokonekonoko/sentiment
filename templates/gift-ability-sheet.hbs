@@ -6,6 +6,24 @@
         <h1 class="effect-title">
             <input name="name" type="text" value="{{data.name}}" placeholder="{{ localize 'Name' }}"/>
         </h1>
+        <div class="ability-header flexcolumn">
+            {{!-- Level --}}
+            <div class="ability-level">
+                <div class="option-name">
+                    <label>Level</label>
+                </div>
+                <div class="header-fields">
+                    <input name="system.level" type="number" value="{{ system.level }}"/>
+                </div>
+            </div>
+
+            {{!-- Unlocked --}}
+            <div class="header-fields">
+                <select class="ability-unlocked" name="system.unlocked">
+                    {{selectOptions selectOptions.unlocked selected=system.unlocked}} 
+                </select>
+            </div>
+        </div>
     </header>
 
     <!-- Effect Configuration Tabs -->
@@ -18,66 +36,27 @@
     <!-- Details Tab -->
     <section class="tab" data-tab="details">
         <div class="form-group editor-container stacked">
-            {{!-- <label>{{ localize "EFFECT.Description" }}</label> --}}
             {{editor descriptionHTML target="system.description" button=false editable=editable engine="prosemirror" collaborate=false}}
         </div>
         <hr>
 
-        TODO remove show toggle. everything is on unless empty.
         <div class="form-group stacked">
 
-            <ol class="ability-options">
-                <header class="effect-change effects-header flexrow">
-                    <div class="option-toggle">Show</div>
-                    <div class="option-name">Option</div>
-                    <div class="option-fields">Values</div>
-                </header>
-
-                {{!-- Level --}}
-                <li class="ability-option flexrow">
-                    <div class="option-toggle">
-                        <input type="checkbox" name="flags.sentiment.levelEnabled"
-                            {{checked flags.levelEnabled}}>
-                    </div>
-                    <div class="option-name">
-                        <label>Level</label>
-                    </div>
-                    <div class="option-fields">
-                        <input name="system.level" type="number" value="{{ system.level }}"/>
-                    </div>
-                </li>
-
-                {{!-- Unlocked --}}
-                <li class="ability-option flexrow">
-                    <div class="option-toggle">
-                        <input type="checkbox" name="flags.sentiment.unlockedEnabled"
-                            {{checked flags.unlockedEnabled}}>
-                    </div>
-                    <div class="option-name">
-                        <label>Unlocked</label>
-                    </div>
-                    <div class="option-fields">
-                        <select class="ability-unlocked" name="system.unlocked">
-                            {{selectOptions selectOptions.unlocked selected=system.unlocked}} 
-                        </select>
-                    </div>
-                </li>
+            <ol class="ability-options flexrow">
 
                 {{!-- Resource --}}
                 <li class="ability-option flexrow">
-                    <div class="option-toggle">
-                        <input type="checkbox" name="flags.sentiment.resourceEnabled"
-                            {{checked flags.resourceEnabled}}>
-                    </div>
                     <div class="option-name">
-                        <label>Resource</label>
-                    </div>
-                    <div class="option-fields">
-                        <div class="form-fields">
+                        <label>
                             <input type="text"
                                 name="system.resource.name"
                                 value="{{ system.resource.name }}"
                                 placeholder="Resource Name"/>
+                        </label>
+                    </div>
+                    <div class="option-fields">
+                        <div class="form-fields">
+                            
                             <input type="number"
                                 name="system.resource.remaining"
                                 value="{{ system.resource.remaining }}"
@@ -93,10 +72,6 @@
 
                 {{!-- Cooldown --}}
                 <li class="ability-option flexrow">
-                    <div class="option-toggle">
-                        <input type="checkbox" name="flags.sentiment.cooldownEnabled"
-                            {{checked flags.cooldownEnabled}}>
-                    </div>
                     <div class="option-name">
                         <label>Cooldown</label>
                     </div>
@@ -104,11 +79,13 @@
                         <div class="form-fields">
                             <input type="number"
                                 name="system.cooldown.remaining"
-                                value="{{ system.cooldown.remaining }}"/>
+                                value="{{ system.cooldown.remaining }}"
+                                placeholder="Remaining"/>
                             <label>/</label>
                             <input type="number"
                                 name="system.cooldown.max"
-                                value="{{ system.cooldown.max }}"/>
+                                value="{{ system.cooldown.max }}"
+                                placeholder="Cooldown"/>
                         </div>
                     </div>
                 </li>

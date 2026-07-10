@@ -39,13 +39,15 @@ export default class GiftSheet extends ItemSheet {
 
         const itemId = draggedAbilityHtml.dataset["itemId"];
 
-        // Data required to allow foundry to create a `toggleDocumentSheet` macro
+        
+        const dragData = {
+            droppedId: itemId,
+            // Data required to allow foundry to create a `toggleDocumentSheet` macro
         // when drag-dropping AE onto hotbar.
         // Consider making it use the ability instead in future?
-        const dragData = {
             type: "ActiveEffect",
-            uuid: draggedAbilityHtml.dataset["itemUuid"],
-            droppedId: itemId
+            uuid: draggedAbilityHtml.dataset["itemUuid"]
+            
         };
         event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
     }
@@ -125,7 +127,6 @@ export default class GiftSheet extends ItemSheet {
         await this.#populateDescription(context);
         await this.#populateAbilities(context);
 
-        console.log("gift getData", context)
         return context;
     }
 
@@ -275,7 +276,6 @@ export default class GiftSheet extends ItemSheet {
         this.#Abilities = []
         for (let effect of context.effects) {
             if (effect.type == "giftAbility") {
-                console.log("effect.system",effect.name,effect.system)
                 effect.enrichedName =
                     await TextEditor.enrichHTML(effect.name, {
                     secrets: this.document.isOwner,

@@ -11,15 +11,7 @@ export default class GiftAbilitySheet extends ActiveEffectConfig {
       classes: ["sentiment", "sheet", "active-effect-sheet", "giftAbility"],
       template: "systems/sentiment/templates/gift-ability-sheet.hbs",
       width: 600,
-      height: 600
-      // tabs: [
-      //   {
-      //     navSelector: ".sheet-tabs",
-      //     contentSelector: "form",
-      //     group: "primary",
-      //     initial: "effects",
-      //   },
-      // ],
+      height: 490
     });
   }
 
@@ -34,10 +26,6 @@ export default class GiftAbilitySheet extends ActiveEffectConfig {
       unlocked: reverseKeyValue(GiftAbilityUnlocked)
     }
 
-    // await this.#populateDescription(context);
-    // this.#populateAbilities(context);
-
-    console.log("gift ability sheet context", context)
     return context;
   }
 }
