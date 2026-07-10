@@ -11,9 +11,7 @@
 
         <hr>
         <ol class="list ability-list">
-            {{log "gift sheet root" @root}}
             {{#each abilities as |ability index|}}
-            {{!-- {{log "ability" ability.name ability}} --}}
             <li class="ability list-item flexcolumn
                 {{~ifThen (gt ability.system.cooldown.remaining 0) ' on-cooldown' ''}}
                 {{~ifThen (gt ability.system.unlocked 0) ' unlocked' ' locked'}}"
