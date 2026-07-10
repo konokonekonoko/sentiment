@@ -24,8 +24,8 @@
   "gridUnits": "ft",
   "flags": {
     "hotReload": {
-      "extensions": ["css","hbs", "html", "json"],
-      "paths": ["styles","templates","lang"]
+      "extensions": ["css","hbs","html"],
+      "paths": ["styles","templates"]
     }
   }
 }
