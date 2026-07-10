@@ -2,13 +2,12 @@ import {
     AttributeStatus,
     GiftEquipStatus,
     RollTypes,
-    AttributeStatusStrings
+    AttributeStatusStrings,
+    ListSortValueIncrement
 } from "../enums.mjs";
 
 import { AttributeIdNoSwing } from "../documents/character.mjs"
 import { GiftEquipStatusInitial } from "../documents/gift.mjs"
-
-const ListSortValueIncrement = 100000;
 
 export default class CharacterSheet extends ActorSheet {
 

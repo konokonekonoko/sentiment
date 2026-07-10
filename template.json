@@ -9,4 +9,10 @@
     "htmlFields": [ "description" ],
     "attribute": {}
   }
+  ,
+  "ActiveEffect": {
+    "types": [ "giftAbility" ],
+    "htmlFields": [ "description" ],
+    "attribute": {}
+  }
 }

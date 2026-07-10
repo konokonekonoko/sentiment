@@ -12,6 +12,12 @@ export const GiftEquipStatus = Object.freeze({
     Primary: 2
 });
 
+// Enum type for Gift Ability unlock state.
+export const GiftAbilityUnlocked = Object.freeze({
+    Locked: 0,
+    Unlocked: 1
+});
+
 // The game's core roll types and their associated strings.
 export const RollTypes = Object.freeze({
     RollToDo: {
@@ -33,3 +39,15 @@ export const AttributeStatusStrings = new Map([
     [AttributeStatus.LockedOut, "Locked Out"],
     [AttributeStatus.Wounded, "Wounded"]
 ]);
+
+// Function to quickly turn states into objects that can be used by
+// the select options helper.
+export function reverseKeyValue(obj) {
+    return Object.entries(obj)
+        .reduce((acc, [key, val]) => {
+            acc[val] = key;
+            return acc;
+        }, {});
+}
+
+export const ListSortValueIncrement = 100000;
