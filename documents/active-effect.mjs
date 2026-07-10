@@ -73,17 +73,16 @@ export class SentimentActiveEffect extends ActiveEffect {
             title: "GiftAbility",
             system: this.system,
         };
-        context.enrichedName = await TextEditor.enrichHTML(this.name, {
-            secrets: this.isOwner,
-            async: true,
+        context.enrichedName = await CONFIG.Sentiment.Enricher.enrich(
+            this.name,
+            this?.object?.uuid ?? "unknown-object", {
+                async: true
         });
-        context.enrichedDescription = await TextEditor.enrichHTML(
+        context.enrichedDescription = await CONFIG.Sentiment.Enricher.enrich(
             this.system.description,
-            {
-                secrets: this.isOwner,
-                async: true,
-            }
-        );
+            this?.object?.uuid ?? "unknown-object", {
+                async: true
+        });
 
         const templatePath =
             "systems/sentiment/templates/abilities/ability-chat.html";

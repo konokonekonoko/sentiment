@@ -304,15 +304,17 @@ export default class GiftSheet extends ItemSheet {
         this.#Abilities = []
         for (let effect of context.effects) {
             if (effect.type == "giftAbility") {
-                effect.enrichedName =
-                    await TextEditor.enrichHTML(effect.name, {
-                    secrets: this.document.isOwner,
-                    async: true
+                effect.enrichedName = await CONFIG.Sentiment.Enricher.enrich(
+                    effect.name,
+                    effect?.uuid ?? "unknown-object", {
+                        secrets: this.document.isOwner,
+                        async: true
                 });
-                effect.enrichedDescription =
-                    await TextEditor.enrichHTML(effect.system.description, {
-                    secrets: this.document.isOwner,
-                    async: true
+                effect.enrichedDescription = await CONFIG.Sentiment.Enricher.enrich(
+                    effect.system.description,
+                    effect?.uuid ?? "unknown-object", {
+                        secrets: this.document.isOwner,
+                        async: true
                 });
                 this.#Abilities.push(effect);
             }
