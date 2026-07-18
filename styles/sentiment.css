@@ -40,6 +40,11 @@
 	margin-right: 10px;
 }
 
+.sentiment .sheet-header .gift-type {
+	min-width: 25%;
+	max-width: fit-content;
+}
+
 .sentiment .sheet-header .header-fields {
 	flex: 1;
 }
