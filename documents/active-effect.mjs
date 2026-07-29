@@ -84,6 +84,7 @@ export class SentimentActiveEffect extends ActiveEffect {
                 async: true,
             }
         );
+        context.giftName = this?.parent?.name
 
         const templatePath =
             "systems/sentiment/templates/abilities/ability-chat.html";
